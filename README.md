@@ -1,6 +1,8 @@
 Fast equation editor
 ---------------
 
+[Live Demo](http://mohd-akram.appspot.com/equations) (append / and then the equation for a link to it)
+
 This editor employs many shortcuts to quickly type equations without using the Shift key. It is written in CoffeeScript. The equations-chrome directory contains a Google Chrome extension of the editor.
 
 **To get started**
