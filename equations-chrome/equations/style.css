@@ -1,0 +1,36 @@
+body {
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+#body {
+  text-align:center;
+}
+
+#equationBox {
+  color:#5C6166;
+  font-size:1.5em;
+  padding-top:10px;
+  padding-bottom:10px;
+}
+
+#inputBox {
+  font-size:1em;
+  margin-bottom:10px;
+}
+
+#button {
+  color:#444;
+  background-color:#F0F0F0;
+  background-image:-webkit-linear-gradient(top, #EDEDED, #EDEDED 38%, #DEDEDE);   border-color:rgba(0, 0, 0, 0.246094);
+  border-width:1px; box-shadow:rgba(0, 0, 0, 0.078125) 0px 1px 0px 0px, rgba(255, 255, 255, 0.746094) 0px 1px 2px 0px inset;
+  border-radius:2px;
+  width:108px;
+  height:24px;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+#shortcuts {
+  text-align:left;
+  font-size:0.7em;
+  color:#999;
+}
