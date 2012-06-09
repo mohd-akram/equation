@@ -1,8 +1,8 @@
 {
-  "name": "Fast Equation Editor",
-  "version": "1.0",
+  "name": "Quick Equations",
+  "version": "1.0.3",
   "manifest_version": 2,
-  "description": "A fast equation editor",
+  "description": "A fast, shortcut based equation editor with realtime preview and WolframAlpha search.",
   "browser_action": {
     "default_icon": "icon.png",
     "default_popup": "equations.html"

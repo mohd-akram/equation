@@ -2,12 +2,16 @@
 (function() {
 
   window.onload = function() {
-    var Timer, changeBrackets, chars, equationBox, findAllIndexes, findAndReplace, findBracket, fontSize, form, funcregex, functions, i, inputBox, insertAtCursor, keyCodeMap, keys, lettersregex, message, miscregex, needBracket, timer, trigfunctions, trigregex, updateBox, updateMath, _i, _len;
+    var Timer, changeBrackets, chars, equationBox, findAllIndexes, findAndReplace, findBracket, fontSize, form, funcregex, functions, i, inputBox, insertAtCursor, keyCodeMap, keys, lettersregex, message, miscregex, needBracket, storedEquation, timer, trigfunctions, trigregex, updateBox, updateMath, _i, _len;
     form = document.getElementById('form');
     inputBox = document.getElementById('inputBox');
     equationBox = document.getElementById('equationBox');
     fontSize = parseFloat(equationBox.style.fontSize);
     message = equationBox.innerHTML;
+    storedEquation = localStorage['equation'];
+    if (storedEquation) {
+      inputBox.value = storedEquation;
+    }
     keyCodeMap = {
       8: "backspace",
       38: "up",
@@ -51,9 +55,9 @@
       'exp': '\exp',
       'log': '\log',
       'sqrt': '√',
-      'integrate': '∫',
-      '[lL]aplace': '\\sc L',
-      'lim': '\lim'
+      'int': '∫',
+      'lim': '\lim',
+      'sum': '∑'
     };
     miscregex = {
       '===': '≡',
@@ -129,11 +133,17 @@
         }
       }
     };
-    changeBrackets = function(string, startPos, endPos, prefix) {
+    changeBrackets = function(string, startPos, endPos, prefix, middle) {
       if (prefix == null) {
         prefix = '';
       }
-      string = string.slice(0, startPos) + prefix + '{' + string.slice(startPos + 1, endPos) + '}' + string.slice(endPos + 1);
+      if (middle == null) {
+        middle = '';
+      }
+      if (!middle) {
+        middle = string.slice(startPos + 1, endPos);
+      }
+      string = string.slice(0, startPos) + prefix + '{' + middle + '}' + string.slice(endPos + 1);
       return string;
     };
     String.prototype.repeat = function(num) {
@@ -214,10 +224,10 @@
       return keys = [];
     };
     updateMath = function() {
-      var endPos, func, indexes, j, opening, startPos, value, _j, _k, _l, _len1, _len2, _len3, _ref;
+      var args, argsList, endPos, func, indexes, j, opening, over, startPos, under, value, _j, _k, _l, _len1, _len2, _len3, _ref;
       value = inputBox.value.replace(/^\s+/, '').replace(/\s+$/, '');
       if (value) {
-        _ref = ['sqrt', '^', 'lim', '/'];
+        _ref = ['sqrt', '^', '/', 'lim', 'int', 'sum'];
         for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
           func = _ref[_j];
           indexes = findAllIndexes(value, func);
@@ -229,6 +239,13 @@
               if (endPos) {
                 if (func === 'lim') {
                   value = changeBrackets(value, startPos, endPos, '↙');
+                } else if (func === 'int' || func === 'sum') {
+                  args = value.slice(startPos + 1, endPos);
+                  argsList = args.split(',');
+                  if (argsList.length === 2) {
+                    under = argsList[0], over = argsList[1];
+                    value = changeBrackets(value, startPos, endPos, '↙', under + '}↖{' + over);
+                  }
                 } else {
                   value = changeBrackets(value, startPos, endPos);
                 }
@@ -253,10 +270,11 @@
         value = findAndReplace(value, miscregex);
         value = value.replace(/&/g, '&amp;').replace(/>/g, '&gt;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
         equationBox.innerHTML = '\$\$' + value + '\$\$';
-        return M.parseMath(equationBox);
+        M.parseMath(equationBox);
       } else {
-        return equationBox.innerHTML = message;
+        equationBox.innerHTML = message;
       }
+      return localStorage['equation'] = inputBox.value;
     };
     updateMath();
     needBracket = function() {
@@ -321,10 +339,14 @@
       }
       return updateMath();
     };
-    return form.onsubmit = function() {
-      return chrome.tabs.create({
-        url: 'http://www.wolframalpha.com/input/?i=' + encodeURIComponent(inputBox.value)
-      });
+    return inputBox.onsearch = function() {
+      if (inputBox.value) {
+        return chrome.tabs.create({
+          url: 'http://www.wolframalpha.com/input/?i=' + encodeURIComponent(inputBox.value)
+        });
+      } else {
+        return updateMath();
+      }
     };
   };
 

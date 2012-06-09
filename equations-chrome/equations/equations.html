@@ -12,20 +12,22 @@
         
     <script type="text/javascript" src="equations.js"></script>
   </head>
+
   <body>
     <div id="body">
       <div id="equationBox">Type an equation below</div>
-
-      <form id="form">
-        <input name="i" id="inputBox" type="text" size="42">
-        <br>
-        <input id="button" type="submit" value="WolframAlpha">
-      </form>
-
-      <div id="shortcuts"><b>Shortcuts</b><br>
-        To get multiple powers, press a key multiple times quickly<br>
-        For parentheses, use [ and ]. Addition uses ; Multiplication uses ' Derivative uses `
+      <input name="i" id="inputBox" type="search" size="42">
+      <br>
+      <div class="outer shortcuts"><b>Shortcuts</b>
+        <div class="inner shortcuts">
+          Addition uses ; Multiplication uses ' Derivative uses `<br>
+          Quickly press a letter n times to get the nth power<br>
+          For parentheses, use [ and ].<br>
+          Use Shift + ] to close all parentheses.<br>
+          Use Up arrow for superscript, Down arrow for subscript
+        </div>
       </div>
     </div>
   </body>
+
 </html>

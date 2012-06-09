@@ -11,7 +11,7 @@ window.onload = ->
   chars = {'[':'(',']':')',"'":'*',';':'+','`':"'",'up':'^(','down':'_'}
   lettersregex = {'alpha':'α','beta':'β','gamma':'γ','delta':'δ','Delta':'Δ','epsilon':'ε','lambda':'λ','mu':'μ','pi':'π','theta':'θ','sigma':'σ','Sigma':'∑','tau':'τ','omega':'ω','Omega':'Ω','inf':'\∞'}
   trigfunctions = ['sin','cos','tan']
-  funcregex = {'exp':'\exp','log':'\log','sqrt':'√','integrate':'∫','[lL]aplace':'\\sc L','lim':'\lim'}
+  funcregex = {'exp':'\exp','log':'\log','sqrt':'√','int':'∫','lim':'\lim','sum':'∑'}
   miscregex = {'===':'≡','<-':'←','->':'→','<==':'⇐','==>':'⇒','<=':'≤','>=':'≥','!=':'≠','!<':'≮','!>':'≯','\\+-':'±','\\*':'×'}
   
   functions = trigfunctions
@@ -54,8 +54,10 @@ window.onload = ->
       if count==0
         return i
 
-  changeBrackets = (string,startPos,endPos,prefix='') ->
-    string = string[0...startPos]+prefix+'{'+string[startPos+1...endPos]+'}'+string[endPos+1...]
+  changeBrackets = (string,startPos,endPos,prefix='',middle='') ->
+    if not middle
+      middle = string[startPos+1...endPos]
+    string = string[0...startPos]+prefix+'{'+middle+'}'+string[endPos+1...]
     return string
 
   String.prototype.repeat = (num) ->
@@ -123,16 +125,26 @@ window.onload = ->
     value = inputBox.value.replace(/^\s+/, '').replace(/\s+$/, '')
     if value
       # Remove parentheses after functions/operations
-      for func in ['sqrt','^','lim','/']
+      for func in ['sqrt','^','/','lim','int','sum']
         indexes = findAllIndexes(value, func)
         for i in indexes
           startPos = i+func.length
           if value[startPos] == '('
             endPos = findBracket(value,startPos)
             if endPos
-              # Limit adjustment
+              # Limit underscript adjustment
               if func=='lim'
                 value = changeBrackets(value,startPos,endPos,'↙')
+
+              # Functions with overscript and underscript
+              else if func=='int' or func=='sum'
+                args = value[startPos+1...endPos]
+                argsList = args.split(',')
+
+                if argsList.length==2
+                  [under,over] =  argsList
+                  value = changeBrackets(value,startPos,endPos,'↙',under+'}↖{'+over)
+
               else
                 value = changeBrackets(value,startPos,endPos)
       

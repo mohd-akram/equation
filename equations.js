@@ -50,9 +50,9 @@
       'exp': '\exp',
       'log': '\log',
       'sqrt': '√',
-      'integrate': '∫',
-      '[lL]aplace': '\\sc L',
-      'lim': '\lim'
+      'int': '∫',
+      'lim': '\lim',
+      'sum': '∑'
     };
     miscregex = {
       '===': '≡',
@@ -128,11 +128,17 @@
         }
       }
     };
-    changeBrackets = function(string, startPos, endPos, prefix) {
+    changeBrackets = function(string, startPos, endPos, prefix, middle) {
       if (prefix == null) {
         prefix = '';
       }
-      string = string.slice(0, startPos) + prefix + '{' + string.slice(startPos + 1, endPos) + '}' + string.slice(endPos + 1);
+      if (middle == null) {
+        middle = '';
+      }
+      if (!middle) {
+        middle = string.slice(startPos + 1, endPos);
+      }
+      string = string.slice(0, startPos) + prefix + '{' + middle + '}' + string.slice(endPos + 1);
       return string;
     };
     String.prototype.repeat = function(num) {
@@ -213,10 +219,10 @@
       return keys = [];
     };
     updateMath = function() {
-      var endPos, func, indexes, j, opening, size, startPos, value, _j, _k, _l, _len1, _len2, _len3, _ref;
+      var args, argsList, endPos, func, indexes, j, opening, over, size, startPos, under, value, _j, _k, _l, _len1, _len2, _len3, _ref;
       value = inputBox.value.replace(/^\s+/, '').replace(/\s+$/, '');
       if (value) {
-        _ref = ['sqrt', '^', 'lim', '/'];
+        _ref = ['sqrt', '^', '/', 'lim', 'int', 'sum'];
         for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
           func = _ref[_j];
           indexes = findAllIndexes(value, func);
@@ -228,6 +234,13 @@
               if (endPos) {
                 if (func === 'lim') {
                   value = changeBrackets(value, startPos, endPos, '↙');
+                } else if (func === 'int' || func === 'sum') {
+                  args = value.slice(startPos + 1, endPos);
+                  argsList = args.split(',');
+                  if (argsList.length === 2) {
+                    under = argsList[0], over = argsList[1];
+                    value = changeBrackets(value, startPos, endPos, '↙', under + '}↖{' + over);
+                  }
                 } else {
                   value = changeBrackets(value, startPos, endPos);
                 }

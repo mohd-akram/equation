@@ -5,6 +5,7 @@
     <meta charset="utf-8">
 
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=UnifrakturMaguntia">
+    <link rel="stylesheet" href="equations.css">
     <link rel="stylesheet" href="jqmath-0.2.0.css">
 	
     <script src="jquery-1.7.2.min.js"></script>
@@ -13,20 +14,23 @@
     <script type="text/javascript" src="equations.js"></script>
   </head>
   <body>
-    <div id="body" style="text-align:center">
-      <div style="text-align:right; width:200px; position:absolute; right:10px; font-family:sans-serif; font-size:0.8em;"><p><b>Shortcuts</b><br><br>
-        To get multiple powers, press a key multiple times quickly<br>
-        For parentheses, use [ and ]<br>
-        Addition uses ;<br>
-        Multiplication uses '<br>
-        Derivative uses `
-      </p>
+    <div id="body">
+      <div class="outer shortcuts"><b>Shortcuts</b>
+        <div class="inner shorcuts">
+          Addition uses ;<br>
+          Multiplication uses '<br>
+          Derivative uses `<br>
+          Quickly press a letter n times to get the nth power<br>
+          For parentheses, use [ and ].<br>
+          Use Shift + ] to close all parentheses.<br>
+          Use Up arrow for superscript, Down arrow for subscript
+        </div>
       </div>
-      <div id="equationBox" style="font-size:2.5em; padding-top:100px; padding-bottom:100px">Type an equation below</div>
+      <div id="equationBox">Type an equation below</div>
       <form action="http://www.wolframalpha.com/input/">
-        <input name="i" id="inputBox" type="text" size="40" style="font-size:2em">
-        <br><br>
-        <input type="submit" value="WolframAlpha" style="font-size:1.5em">
+        <input name="i" id="inputBox" type="text" size="40">
+        <br>
+        <input id="button" type="submit" value="WolframAlpha">
       </form>
     </div>
   </body>
