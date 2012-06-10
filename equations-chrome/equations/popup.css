@@ -47,3 +47,11 @@ body {
 .outer:hover .inner {
   display: block;
 }
+
+#equationBox-wolfram {
+  overflow:auto;
+  color:#5C6166;
+  font-size:1.5em;
+  margin-top:80px;
+  padding-bottom:10px;
+}

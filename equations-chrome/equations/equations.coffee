@@ -1,12 +1,17 @@
-window.onload = ->
-  form = document.getElementById('form')
-  inputBox = document.getElementById('inputBox')
-  equationBox = document.getElementById('equationBox')
-  fontSize = parseFloat(equationBox.style.fontSize)
-  message = equationBox.innerHTML
-  storedEquation = localStorage['equation']
+enabled = false
 
-  if storedEquation
+window.startEquations = (inputBox,equationBox,message='',storeEq=false) ->
+  if not enabled
+    enabled = true
+  else
+    enabled = false
+    inputBox.onkeyup = ->
+    inputBox.onkeydown = ->
+    equationBox.innerHTML = message
+    return
+
+  storedEquation = localStorage['equation']
+  if storeEq and storedEquation
     inputBox.value = storedEquation
 
   keyCodeMap = {
@@ -178,7 +183,8 @@ window.onload = ->
       equationBox.innerHTML = message
 
     # Save current equation
-    localStorage['equation'] = inputBox.value
+    if storeEq
+      localStorage['equation'] = inputBox.value
 
   #Update Math Display on load
   updateMath()
@@ -239,9 +245,3 @@ window.onload = ->
         insertAtCursor(inputBox,'(')
 
     updateMath()
-
-  inputBox.onsearch  = ->
-    if inputBox.value
-       chrome.tabs.create({url: 'http://www.wolframalpha.com/input/?i='+encodeURIComponent(inputBox.value)})
-    else
-      updateMath()
