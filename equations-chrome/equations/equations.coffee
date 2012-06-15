@@ -1,16 +1,7 @@
-enabled = false
-
 window.startEquations = (inputBox,equationBox,message='',storeEq=false) ->
-  if not enabled
-    enabled = true
-  else
-    enabled = false
-    inputBox.onkeyup = ->
-    inputBox.onkeydown = ->
-    equationBox.innerHTML = message
-    return
 
   storedEquation = localStorage['equation']
+
   if storeEq and storedEquation
     inputBox.value = storedEquation
 
@@ -245,3 +236,9 @@ window.startEquations = (inputBox,equationBox,message='',storeEq=false) ->
         insertAtCursor(inputBox,'(')
 
     updateMath()
+
+window.stopEquations = (inputBox,equationBox,message='') ->
+
+  inputBox.onkeyup = ->
+  inputBox.onkeydown = ->
+  equationBox.innerHTML = message

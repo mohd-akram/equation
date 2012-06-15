@@ -28,7 +28,7 @@
       return startEquations(inputBox, document.getElementById('equationBox-wolfram'), "Type an equation above");
     } else {
       equationBox = document.getElementById('equationBox-wolfram');
-      startEquations(inputBox, equationBox);
+      stopEquations(inputBox, equationBox);
       parent = document.getElementById('calculatecontain');
       return parent.removeChild(equationBox);
     }
