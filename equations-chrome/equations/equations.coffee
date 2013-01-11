@@ -5,15 +5,24 @@ window.startEquations = (inputBox,equationBox,message='',storeEq=false) ->
   if storeEq and storedEquation
     inputBox.value = storedEquation
 
-  keyCodeMap = {
-    8:"backspace", 38:"up", 40:"down", 59:";", 186:";", 192:'`', 219:"[", 221:"]", 222:"'"
-    }
+  keyCodeMap = {8:"backspace", 38:"up", 40:"down", 59:";", 186:";",
+  192:'`', 219:"[", 221:"]", 222:"'"}
 
   chars = {'[':'(',']':')',"'":'*',';':'+','`':"'",'up':'^(','down':'_'}
-  lettersregex = {'alpha':'α','beta':'β','gamma':'γ','delta':'δ','Delta':'Δ','epsilon':'ε','lambda':'λ','mu':'μ','pi':'π','theta':'θ','sigma':'σ','Sigma':'∑','tau':'τ','omega':'ω','Omega':'Ω','inf':'\∞'}
+
+  lettersregex = {
+    'alpha':'α','beta':'β','gamma':'γ','delta':'δ',
+    'Delta':'Δ','epsilon':'ε','lambda':'λ','mu':'μ','pi':'π','theta':'θ',
+    'sigma':'σ','Sigma':'∑','tau':'τ','omega':'ω','Omega':'Ω','inf':'\∞'}
+
   trigfunctions = ['sin','cos','tan']
-  funcregex = {'exp':'\exp','log':'\log','sqrt':'√','int':'∫','lim':'\lim','sum':'∑'}
-  miscregex = {'===':'≡','<-':'←','->':'→','<==':'⇐','==>':'⇒','<=':'≤','>=':'≥','!=':'≠','!<':'≮','!>':'≯','\\+-':'±','\\*':'×'}
+
+  funcregex = {
+    'exp':'\exp','log':'\log','sqrt':'√','int':'∫','lim':'\lim','sum':'∑'}
+
+  miscregex = {
+    '===':'≡','<-':'←','->':'→','<==':'⇐','==>':'⇒','<=':'≤',
+    '>=':'≥','!=':'≠','!<':'≮','!>':'≯','\\+-':'±','\\*':'×'}
   
   functions = trigfunctions
   
@@ -27,14 +36,14 @@ window.startEquations = (inputBox,equationBox,message='',storeEq=false) ->
   
   findAndReplace = (string,object) ->
     for i,j of object
-        regex = new RegExp(i,"g")
-        string = string.replace(regex,j)
+      regex = new RegExp(i,"g")
+      string = string.replace(regex,j)
     return string
 
   findAllIndexes = (source, find) ->
     result = []
     for i in [0...source.length-1]
-      if source.substring(i, i + find.length) == find
+      if source[i...i + find.length] == find
         result.push(i)
 
     return result
@@ -48,9 +57,9 @@ window.startEquations = (inputBox,equationBox,message='',storeEq=false) ->
 
     for i in range
       if string[i] == '('
-          count += 1
+        count += 1
       if string[i] == ')'
-          count -= 1
+        count -= 1
 
       if count==0
         return i
@@ -78,7 +87,12 @@ window.startEquations = (inputBox,equationBox,message='',storeEq=false) ->
       startPos = field.selectionStart-del
       endPos = field.selectionEnd
       scrollTop = field.scrollTop
-      field.value = field.value.substring(0, startPos)+ value+ field.value.substring(endPos, field.value.length)
+
+      field.value = "
+#{ field.value[0...startPos] }
+#{ value }
+#{ field.value[endPos...field.value.length] }"
+      
       field.focus()
       field.selectionStart = startPos + value.length
       field.selectionEnd = startPos + value.length
@@ -90,34 +104,21 @@ window.startEquations = (inputBox,equationBox,message='',storeEq=false) ->
 
     updateMath()
 
-  class Timer
-    startTimer: (duration) ->
-      @duration = duration
-      @startTime = (new Date).getTime()
-      clearTimeout(@timeout)
-      @timeout = setTimeout((-> updateBox()),@duration)
-
-    isOn: ->
-      if @startTime
-        return ((new Date).getTime() - @startTime < @duration)
-      return false
-
-  timer = new Timer()
   keys = []
   updateBox = ->
     if keys
-        length = keys.length
-        startIdx = 0
-        if length>1
-          char = keys[length-1]
-          for i in [length-1...-1] by -1
-            if keys[i] != char
-              startIdx = i+1
-              break
+      length = keys.length
+      startIdx = 0
+      if length>1
+        char = keys[length-1]
+        for i in [length-1...-1] by -1
+          if keys[i] != char
+            startIdx = i+1
+            break
 
-          power = length-startIdx
-          if power>1
-            insertAtCursor(inputBox,char+'^'+power.toString(),power)
+        power = length-startIdx
+        if power>1
+          insertAtCursor(inputBox,char+'^'+power.toString(),power)
          
     keys = []
 
@@ -144,7 +145,8 @@ window.startEquations = (inputBox,equationBox,message='',storeEq=false) ->
 
                 if argsList.length==2
                   [under,over] =  argsList
-                  value = changeBrackets(value,startPos,endPos,'↙',under+'}↖{'+over)
+                  value = changeBrackets(value,startPos,endPos,
+                                         '↙',under+'}↖{'+over)
 
               else
                 value = changeBrackets(value,startPos,endPos)
@@ -164,12 +166,14 @@ window.startEquations = (inputBox,equationBox,message='',storeEq=false) ->
       value = findAndReplace(value,miscregex)
       
       # Escape string
-      value = value.replace(/&/g, '&amp;').replace(/>/g, '&gt;').replace(/</g, '&lt;').replace(/"/g, '&quot;')
+      value = value.replace(/&/g, '&amp;')
+                   .replace(/>/g, '&gt;')
+                   .replace(/</g, '&lt;')
+                   .replace(/"/g, '&quot;')
 
       equationBox.innerHTML = '\$\$' + value + '\$\$'
 
       M.parseMath(equationBox)
-      
     else
       equationBox.innerHTML = message
 
@@ -183,15 +187,18 @@ window.startEquations = (inputBox,equationBox,message='',storeEq=false) ->
   needBracket = ->
     startPos = inputBox.selectionStart
     for f in trigfunctions
-      string = inputBox.value.substring(startPos-(f.length+1), startPos)
+      string = inputBox.value[startPos-(f.length+1)...startPos]
       if string == f+'h'
         return true
 
     for f in functions
-      string = inputBox.value.substring(startPos-(f.length), startPos)
+      string = inputBox.value[startPos-(f.length)...startPos]
       if string == f
         return true
-           
+
+  #Initialize timeout. Used for exponent/power shortcut.
+  timeout = setTimeout()
+
   # On key down event
   inputBox.onkeydown = (event) ->
     keyCode = event.keyCode
@@ -199,7 +206,8 @@ window.startEquations = (inputBox,equationBox,message='',storeEq=false) ->
     initialValue = inputBox.value[...-1]
 
     if (keyCode >= 65 and keyCode <= 90)
-      timer.startTimer(300)
+      clearTimeout(timeout)
+      timeout = setTimeout((-> updateBox()),300)
       keys.push key
 
     char = keyCodeMap[event.keyCode]
@@ -211,7 +219,7 @@ window.startEquations = (inputBox,equationBox,message='',storeEq=false) ->
       # Close all brackets
       if event.shiftKey and keyCodeMap[event.keyCode] == ']'
         startPos = inputBox.selectionStart
-        value = inputBox.value.substring(0, startPos)
+        value = inputBox.value[0...startPos]
 
         bracketsNo = 0
         for i in value

@@ -6,6 +6,8 @@ window.onload = ->
 
   inputBox.onsearch  = ->
     if inputBox.value
-       chrome.tabs.create({url: 'http://www.wolframalpha.com/input/?i='+encodeURIComponent(inputBox.value)})
+      url = "http://www.wolframalpha.com/input/?i=
+#{encodeURIComponent(inputBox.value)}"
+      chrome.tabs.create({url: url})
     else
       equationBox.innerHTML = message
