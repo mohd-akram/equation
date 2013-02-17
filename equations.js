@@ -157,7 +157,7 @@
         }
         sel.text = value;
         field.focus();
-      } else if (field.selectionStart || field.selectionStart === '0') {
+      } else if (field.selectionStart || field.selectionStart === 0) {
         startPos = field.selectionStart - del;
         endPos = field.selectionEnd;
         scrollTop = field.scrollTop;
@@ -195,15 +195,16 @@
       return keys = [];
     };
     updateMath = function() {
-      var args, argsList, endPos, func, indexes, j, opening, over, size, startPos, under, value, _j, _k, _l, _len1, _len2, _len3, _ref;
-      value = inputBox.value.replace(/^\s+/, '').replace(/\s+$/, '');
+      var args, argsList, endPos, func, indexes, j, opening, over, size, startPos, under, value, _j, _k, _l, _len1, _len2, _len3, _ref, _ref1;
+      value = inputBox.value.replace(/\\html/g, '').replace(/^\s+/, '').replace(/[\s\\]+$/, '');
       if (value) {
         _ref = ['sqrt', '^', '/', 'lim', 'int', 'sum'];
         for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
           func = _ref[_j];
           indexes = findAllIndexes(value, func);
-          for (_k = 0, _len2 = indexes.length; _k < _len2; _k++) {
-            i = indexes[_k];
+          _ref1 = indexes.reverse();
+          for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
+            i = _ref1[_k];
             startPos = i + func.length;
             if (value[startPos] === '(') {
               endPos = findBracket(value, startPos);
@@ -240,11 +241,11 @@
         value = findAndReplace(value, trigregex);
         value = findAndReplace(value, miscregex);
         value = value.replace(/&/g, '&amp;').replace(/>/g, '&gt;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
-        if (value.length > 100) {
+        if (value.length > 160) {
           size = fontSize - 1.2;
-        } else if (value.length > 50) {
+        } else if (value.length > 80) {
           size = fontSize - 0.8;
-        } else if (value.length > 25) {
+        } else if (value.length > 40) {
           size = fontSize - 0.4;
         } else {
           size = fontSize;
@@ -276,7 +277,7 @@
         }
       }
     };
-    timeout = setTimeout();
+    timeout = setTimeout(null, null);
     inputBox.onkeydown = function(event) {
       var bracketsNo, char, initialValue, key, keyCode, startPos, value, _j, _len1;
       keyCode = event.keyCode;
@@ -314,7 +315,7 @@
         }
       }
     };
-    return inputBox.onkeyup = function(event) {
+    inputBox.onkeyup = function(event) {
       var keyCode;
       keyCode = event.keyCode;
       if (keyCode >= 65 && keyCode <= 90) {
@@ -323,6 +324,11 @@
         }
       }
       return updateMath();
+    };
+    return inputBox.onsearch = function() {
+      if (!inputBox.value) {
+        return equationBox.innerHTML = message;
+      }
     };
   };
 

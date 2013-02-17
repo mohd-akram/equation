@@ -1,5 +1,4 @@
 window.startEquations = (inputBox,equationBox,message='',storeEq=false) ->
-
   storedEquation = localStorage['equation']
 
   if storeEq and storedEquation
@@ -83,7 +82,7 @@ window.startEquations = (inputBox,equationBox,message='',storeEq=false) ->
       sel.text = value
       field.focus()
 
-    else if (field.selectionStart or field.selectionStart == '0')
+    else if (field.selectionStart or field.selectionStart == 0)
       startPos = field.selectionStart-del
       endPos = field.selectionEnd
       scrollTop = field.scrollTop
@@ -123,13 +122,15 @@ window.startEquations = (inputBox,equationBox,message='',storeEq=false) ->
     keys = []
 
   updateMath = ->
-    # Get value without whitespace
-    value = inputBox.value.replace(/^\s+/, '').replace(/\s+$/, '')
+    # Get value without whitespace, trailing backslashes, \html macro
+    value = inputBox.value.replace(/\\html/g, '')
+                          .replace(/^\s+/, '')
+                          .replace(/[\s\\]+$/, '')
     if value
       # Remove parentheses after functions/operations
       for func in ['sqrt','^','/','lim','int','sum']
         indexes = findAllIndexes(value, func)
-        for i in indexes
+        for i in indexes.reverse()
           startPos = i+func.length
           if value[startPos] == '('
             endPos = findBracket(value,startPos)
@@ -197,7 +198,7 @@ window.startEquations = (inputBox,equationBox,message='',storeEq=false) ->
         return true
 
   #Initialize timeout. Used for exponent/power shortcut.
-  timeout = setTimeout()
+  timeout = setTimeout(null, null)
 
   # On key down event
   inputBox.onkeydown = (event) ->

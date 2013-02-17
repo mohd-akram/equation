@@ -163,7 +163,7 @@
         }
         sel.text = value;
         field.focus();
-      } else if (field.selectionStart || field.selectionStart === '0') {
+      } else if (field.selectionStart || field.selectionStart === 0) {
         startPos = field.selectionStart - del;
         endPos = field.selectionEnd;
         scrollTop = field.scrollTop;
@@ -201,15 +201,16 @@
       return keys = [];
     };
     updateMath = function() {
-      var args, argsList, endPos, func, indexes, j, opening, over, startPos, under, value, _j, _k, _l, _len1, _len2, _len3, _ref;
-      value = inputBox.value.replace(/^\s+/, '').replace(/\s+$/, '');
+      var args, argsList, endPos, func, indexes, j, opening, over, startPos, under, value, _j, _k, _l, _len1, _len2, _len3, _ref, _ref1;
+      value = inputBox.value.replace(/\\html/g, '').replace(/^\s+/, '').replace(/[\s\\]+$/, '');
       if (value) {
         _ref = ['sqrt', '^', '/', 'lim', 'int', 'sum'];
         for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
           func = _ref[_j];
           indexes = findAllIndexes(value, func);
-          for (_k = 0, _len2 = indexes.length; _k < _len2; _k++) {
-            i = indexes[_k];
+          _ref1 = indexes.reverse();
+          for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
+            i = _ref1[_k];
             startPos = i + func.length;
             if (value[startPos] === '(') {
               endPos = findBracket(value, startPos);
@@ -274,7 +275,7 @@
         }
       }
     };
-    timeout = setTimeout();
+    timeout = setTimeout(null, null);
     inputBox.onkeydown = function(event) {
       var bracketsNo, char, initialValue, key, keyCode, startPos, value, _j, _len1;
       keyCode = event.keyCode;

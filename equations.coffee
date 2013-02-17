@@ -82,7 +82,7 @@ window.onload = ->
       sel.text = value
       field.focus()
 
-    else if (field.selectionStart or field.selectionStart == '0')
+    else if (field.selectionStart or field.selectionStart == 0)
       startPos = field.selectionStart-del
       endPos = field.selectionEnd
       scrollTop = field.scrollTop
@@ -122,13 +122,16 @@ window.onload = ->
     keys = []
 
   updateMath = ->
-    # Get value without whitespace
-    value = inputBox.value.replace(/^\s+/, '').replace(/\s+$/, '')
+    # Get value without whitespace, trailing backslashes, \html macro
+    value = inputBox.value.replace(/\\html/g, '')
+                          .replace(/^\s+/, '')
+                          .replace(/[\s\\]+$/, '')
+                          
     if value
       # Remove parentheses after functions/operations
       for func in ['sqrt','^','/','lim','int','sum']
         indexes = findAllIndexes(value, func)
-        for i in indexes
+        for i in indexes.reverse()
           startPos = i+func.length
           if value[startPos] == '('
             endPos = findBracket(value,startPos)
@@ -171,13 +174,13 @@ window.onload = ->
                    .replace(/"/g, '&quot;')
 
       # Resize to fit
-      if value.length>100
+      if value.length > 160
         size = fontSize - 1.2
 
-      else if value.length>50
+      else if value.length > 80
         size = fontSize - 0.8
 
-      else if value.length>25
+      else if value.length > 40
         size = fontSize - 0.4
 
       else
@@ -208,7 +211,7 @@ window.onload = ->
         return true
 
   #Initialize timeout. Used for exponent/power shortcut.
-  timeout = setTimeout()
+  timeout = setTimeout(null, null)
 
   # On key down event
   inputBox.onkeydown = (event) ->
@@ -255,3 +258,7 @@ window.onload = ->
         insertAtCursor(inputBox,'(')
 
     updateMath()
+
+  inputBox.onsearch = ->
+    if not inputBox.value
+      equationBox.innerHTML = message
