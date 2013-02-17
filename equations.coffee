@@ -211,13 +211,12 @@ window.onload = ->
         return true
 
   #Initialize timeout. Used for exponent/power shortcut.
-  timeout = setTimeout(null, null)
+  timeout = setTimeout((->), 0)
 
   # On key down event
   inputBox.onkeydown = (event) ->
     keyCode = event.keyCode
     key = String.fromCharCode(keyCode).toLowerCase()
-    initialValue = inputBox.value[...-1]
 
     if (keyCode >= 65 and keyCode <= 90)
       clearTimeout(timeout)

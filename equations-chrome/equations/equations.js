@@ -2,16 +2,20 @@
 (function() {
 
   window.startEquations = function(inputBox, equationBox, message, storeEq) {
-    var changeBrackets, chars, findAllIndexes, findAndReplace, findBracket, funcregex, functions, i, insertAtCursor, keyCodeMap, keys, lettersregex, miscregex, needBracket, storedEquation, timeout, trigfunctions, trigregex, updateBox, updateMath, _i, _len;
+    var changeBrackets, chars, findAllIndexes, findAndReplace, findBracket, funcregex, functions, i, insertAtCursor, keyCodeMap, keys, lettersregex, miscregex, needBracket, timeout, trigfunctions, trigregex, updateBox, updateMath, _i, _len;
     if (message == null) {
       message = '';
     }
     if (storeEq == null) {
       storeEq = false;
     }
-    storedEquation = localStorage['equation'];
-    if (storeEq && storedEquation) {
-      inputBox.value = storedEquation;
+    if (storeEq) {
+      chrome.storage.sync.get('equation', function(items) {
+        if (items.equation) {
+          inputBox.value = items.equation;
+          return updateMath();
+        }
+      });
     }
     keyCodeMap = {
       8: "backspace",
@@ -253,7 +257,9 @@
         equationBox.innerHTML = message;
       }
       if (storeEq) {
-        return localStorage['equation'] = inputBox.value;
+        return chrome.storage.sync.set({
+          'equation': inputBox.value
+        });
       }
     };
     updateMath();
@@ -275,12 +281,11 @@
         }
       }
     };
-    timeout = setTimeout(null, null);
+    timeout = setTimeout((function() {}), 0);
     inputBox.onkeydown = function(event) {
-      var bracketsNo, char, initialValue, key, keyCode, startPos, value, _j, _len1;
+      var bracketsNo, char, key, keyCode, startPos, value, _j, _len1;
       keyCode = event.keyCode;
       key = String.fromCharCode(keyCode).toLowerCase();
-      initialValue = inputBox.value.slice(0, -1);
       if (keyCode >= 65 && keyCode <= 90) {
         clearTimeout(timeout);
         timeout = setTimeout((function() {

@@ -1,6 +1,6 @@
 {
   "name": "Quick Equations",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "manifest_version": 2,
   "description": "A fast, shortcut based equation editor with realtime preview and WolframAlpha support.",
   "browser_action": {
@@ -8,11 +8,13 @@
     "default_popup": "popup.html"
   },
   "content_scripts": [ {
-      "js": ["mathscribe/jquery-1.8.3.min.js","mathscribe/jqmath-etc-0.3.0.min.js","equations.js","contentscript.js"],
+      "js": ["mathscribe/jquery-1.9.1.min.js","mathscribe/jquery-migrate-1.1.1.min.js","mathscribe/jqmath-etc-0.3.0.min.js","equations.js","contentscript.js"],
       "css": ["mathscribe/jqmath-0.3.0.css","contentscript.css"],
       "matches": [ "http://www.wolframalpha.com/input/*","https://www.wolframalpha.com/input/*"]
    } ],
- 
+  "permissions": [
+    "storage"
+  ], 
   "icons": { "48": "icon48.png",
              "128": "icon128.png"
   },

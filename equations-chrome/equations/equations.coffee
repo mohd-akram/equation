@@ -1,8 +1,10 @@
 window.startEquations = (inputBox,equationBox,message='',storeEq=false) ->
-  storedEquation = localStorage['equation']
-
-  if storeEq and storedEquation
-    inputBox.value = storedEquation
+  if storeEq
+    chrome.storage.sync.get('equation', (items) ->
+      if items.equation
+        inputBox.value = items.equation
+        updateMath()
+    )
 
   keyCodeMap = {8:"backspace", 38:"up", 40:"down", 59:";", 186:";",
   192:'`', 219:"[", 221:"]", 222:"'"}
@@ -180,7 +182,7 @@ window.startEquations = (inputBox,equationBox,message='',storeEq=false) ->
 
     # Save current equation
     if storeEq
-      localStorage['equation'] = inputBox.value
+      chrome.storage.sync.set({'equation': inputBox.value})
 
   #Update Math Display on load
   updateMath()
@@ -198,13 +200,12 @@ window.startEquations = (inputBox,equationBox,message='',storeEq=false) ->
         return true
 
   #Initialize timeout. Used for exponent/power shortcut.
-  timeout = setTimeout(null, null)
+  timeout = setTimeout((->), 0)
 
   # On key down event
   inputBox.onkeydown = (event) ->
     keyCode = event.keyCode
     key = String.fromCharCode(keyCode).toLowerCase()
-    initialValue = inputBox.value[...-1]
 
     if (keyCode >= 65 and keyCode <= 90)
       clearTimeout(timeout)

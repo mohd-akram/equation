@@ -277,12 +277,11 @@
         }
       }
     };
-    timeout = setTimeout(null, null);
+    timeout = setTimeout((function() {}), 0);
     inputBox.onkeydown = function(event) {
-      var bracketsNo, char, initialValue, key, keyCode, startPos, value, _j, _len1;
+      var bracketsNo, char, key, keyCode, startPos, value, _j, _len1;
       keyCode = event.keyCode;
       key = String.fromCharCode(keyCode).toLowerCase();
-      initialValue = inputBox.value.slice(0, -1);
       if (keyCode >= 65 && keyCode <= 90) {
         clearTimeout(timeout);
         timeout = setTimeout((function() {
