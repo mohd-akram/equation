@@ -1,6 +1,6 @@
 {
   "name": "Quick Equations",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "manifest_version": 2,
   "description": "A fast, shortcut based equation editor with realtime preview and WolframAlpha support.",
   "browser_action": {
