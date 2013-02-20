@@ -2,7 +2,7 @@
 (function() {
 
   window.onload = function() {
-    var changeBrackets, chars, equationBox, findAllIndexes, findAndReplace, findBracket, fontSize, funcregex, functions, i, inputBox, insertAtCursor, keyCodeMap, keys, lettersregex, message, miscregex, needBracket, timeout, trigfunctions, trigregex, updateBox, updateMath, _i, _len;
+    var changeBrackets, chars, equationBox, findAllIndexes, findAndReplace, findBracket, fontSize, funcregex, functions, i, inputBox, insertAtCursor, keyCodeMap, keys, lettersregex, message, miscregex, needBracket, parseMatrices, timeout, trigfunctions, trigregex, updateBox, updateMath, _i, _len;
     inputBox = document.getElementById('inputBox');
     equationBox = document.getElementById('equationBox');
     fontSize = parseFloat(equationBox.style.fontSize);
@@ -128,6 +128,33 @@
         }
       }
     };
+    parseMatrices = function(string) {
+      var bracketEnd, c, idx, innerBracketStart, opening, rowEnd, rowStart, rows, s, table, _j, _len1;
+      s = string;
+      for (idx = _j = 0, _len1 = s.length; _j < _len1; idx = ++_j) {
+        c = s[idx];
+        if (s.slice(idx, idx + 2) === '((') {
+          bracketEnd = findBracket(s, idx);
+          innerBracketStart = findBracket(s, bracketEnd - 1, opening = true);
+          if (s[innerBracketStart - 1] === ',' || innerBracketStart === idx + 1) {
+            rows = [];
+            rowStart = idx + 1;
+            while (true) {
+              rowEnd = findBracket(s, rowStart);
+              rows.push(s.slice(rowStart + 1, rowEnd));
+              if (s[rowEnd + 1] === ',') {
+                rowStart = rowEnd + 2;
+              } else {
+                break;
+              }
+            }
+            table = "(\\table " + (rows.join(';')) + ")";
+            s = s.slice(0, idx) + table + s.slice(bracketEnd + 1);
+          }
+        }
+      }
+      return s;
+    };
     changeBrackets = function(string, startPos, endPos, prefix, middle) {
       if (prefix == null) {
         prefix = '';
@@ -196,9 +223,10 @@
     };
     updateMath = function() {
       var args, argsList, endPos, func, indexes, j, opening, over, size, startPos, under, value, _j, _k, _l, _len1, _len2, _len3, _ref, _ref1;
-      value = inputBox.value.replace(/\\html/g, '').replace(/^\s+/, '').replace(/[\s\\]+$/, '');
+      value = inputBox.value.replace(/\s/g, '').replace(/\$/g, '').replace(/\\html/g, '').replace(/[\\]+$/, '');
+      value = parseMatrices(value);
       if (value) {
-        _ref = ['sqrt', '^', '/', 'lim', 'int', 'sum'];
+        _ref = ['sqrt', '^', '_', '/', 'lim', 'int', 'sum'];
         for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
           func = _ref[_j];
           indexes = findAllIndexes(value, func);

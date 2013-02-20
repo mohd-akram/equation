@@ -60,8 +60,28 @@ window.onload = ->
       if string[i] == ')'
         count -= 1
 
-      if count==0
+      if count == 0
         return i
+
+  parseMatrices = (string) ->
+    s = string
+    for c, idx in s
+      if s[idx...idx+2] == '(('
+        bracketEnd = findBracket(s, idx)
+        innerBracketStart = findBracket(s,bracketEnd-1,opening=true)
+        if s[innerBracketStart-1] == ',' or innerBracketStart == idx + 1
+          rows = []
+          rowStart = idx + 1
+          while true
+            rowEnd = findBracket(s, rowStart)
+            rows.push(s[rowStart+1...rowEnd])
+            if s[rowEnd+1] == ','
+              rowStart = rowEnd+2
+            else
+              break
+          table = "(\\table #{ rows.join(';') })"
+          s = s[0...idx] + table + s[bracketEnd+1...]
+    return s
 
   changeBrackets = (string,startPos,endPos,prefix='',middle='') ->
     if not middle
@@ -123,13 +143,16 @@ window.onload = ->
 
   updateMath = ->
     # Get value without whitespace, trailing backslashes, \html macro
-    value = inputBox.value.replace(/\\html/g, '')
-                          .replace(/^\s+/, '')
-                          .replace(/[\s\\]+$/, '')
-                          
+    value = inputBox.value.replace(/\s/g, '')
+                          .replace(/\$/g, '')
+                          .replace(/\\html/g, '')
+                          .replace(/[\\]+$/, '')
+
+    value = parseMatrices(value)
+
     if value
       # Remove parentheses after functions/operations
-      for func in ['sqrt','^','/','lim','int','sum']
+      for func in ['sqrt','^','_','/','lim','int','sum']
         indexes = findAllIndexes(value, func)
         for i in indexes.reverse()
           startPos = i+func.length
