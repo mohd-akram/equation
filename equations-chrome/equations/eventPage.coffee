@@ -1,4 +1,24 @@
-getInputBoxes = "inputBoxes = document.querySelectorAll('input[id^=AnSwEr]')"
+loadEquations = (tabId, tab) ->
+  storeURL = 'https://chrome.google.com/webstore'
+  getInputBoxes = "inputBoxes = document.querySelectorAll('input[id^=AnSwEr]')"
+
+  if tab.url[...4] == 'http' and tab.url[...storeURL.length] != storeURL
+    chrome.tabs.executeScript tabId,
+      code: getInputBoxes, (result) ->
+        if Object.keys(result[0]).length != 0
+          chrome.tabs.insertCSS tabId,
+            file: "mathscribe/jqmath-0.3.0.css"
+
+          chrome.tabs.executeScript tabId,
+            file: "mathscribe/jquery-1.9.1.min.js", ->
+              chrome.tabs.executeScript tabId,
+                file: "mathscribe/jquery-migrate-1.1.1.min.js", ->
+                  chrome.tabs.executeScript tabId,
+                    file: "mathscribe/jqmath-etc-0.3.0.min.js", ->
+                      chrome.tabs.executeScript tabId,
+                        file: "equations.js", ->
+                          chrome.tabs.executeScript tabId,
+                            file: "webwork.js"
 
 chrome.tabs.onUpdated.addListener (tabId, changeInfo, tab) ->
   if changeInfo.status == 'complete'
@@ -7,20 +27,4 @@ chrome.tabs.onUpdated.addListener (tabId, changeInfo, tab) ->
       origins: ["http://*/*", "https://*/*"],
       (permitted) ->
         if permitted
-          if tab.url[...4] == 'http'
-            chrome.tabs.executeScript tabId,
-              code: getInputBoxes, (result) ->
-                if Object.keys(result[0]).length != 0
-                  chrome.tabs.insertCSS tabId,
-                    file: "mathscribe/jqmath-0.3.0.css"
-
-                  chrome.tabs.executeScript tabId,
-                    file: "mathscribe/jquery-1.9.1.min.js", ->
-                      chrome.tabs.executeScript tabId,
-                        file: "mathscribe/jquery-migrate-1.1.1.min.js", ->
-                          chrome.tabs.executeScript tabId,
-                            file: "mathscribe/jqmath-etc-0.3.0.min.js", ->
-                              chrome.tabs.executeScript tabId,
-                                file: "equations.js", ->
-                                  chrome.tabs.executeScript tabId,
-                                    file: "webwork.js"
+          loadEquations(tabId, tab)
