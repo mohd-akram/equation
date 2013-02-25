@@ -89,8 +89,8 @@ window.onload = ->
     string = string[...startPos]+prefix+'{'+middle+'}'+string[endPos+1...]
     return string
 
-  String.prototype.repeat = (num) ->
-    return new Array( num + 1 ).join( this )
+  String::repeat = (num) ->
+    return new Array(num + 1).join(this)
  
   insertAtCursor = (field,value,del = 0) ->
     # If IE
@@ -145,8 +145,10 @@ window.onload = ->
     # Get value without whitespace, trailing backslashes, \html macro
     value = inputBox.value.replace(/\s/g, '')
                           .replace(/\$/g, '')
-                          .replace(/\\html/g, '')
-                          .replace(/[\\]+$/, '')
+                          .replace(/\\bo|\\it|\\bi/g, '')
+                          .replace(/\\sc|\\fr/g, '')
+                          .replace(/\\table|\\text|\\html/g, '')
+                          .replace(/\\+$/, '')
 
     value = parseMatrices(value)
 

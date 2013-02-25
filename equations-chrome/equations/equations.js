@@ -233,7 +233,7 @@
     };
     updateMath = function() {
       var args, argsList, endPos, func, indexes, j, opening, over, startPos, under, value, _j, _k, _l, _len1, _len2, _len3, _ref, _ref1;
-      value = inputBox.value.replace(/\s/g, '').replace(/\$/g, '').replace(/\\html/g, '').replace(/[\\]+$/, '');
+      value = inputBox.value.replace(/\s/g, '').replace(/\$/g, '').replace(/\\bo|\\it|\\bi/g, '').replace(/\\sc|\\fr/g, '').replace(/\\table|\\text|\\html/g, '').replace(/\\+$/, '');
       value = parseMatrices(value);
       if (value) {
         _ref = ['sqrt', '^', '_', '/', 'lim', 'int', 'sum'];

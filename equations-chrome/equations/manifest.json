@@ -7,14 +7,20 @@
     "default_icon": "icon.png",
     "default_popup": "popup.html"
   },
+  "options_page": "options.html",
+  "background": {
+    "scripts": [ "eventPage.js" ],
+    "persistent": false
+  },
   "content_scripts": [ {
-      "js": ["mathscribe/jquery-1.9.1.min.js","mathscribe/jquery-migrate-1.1.1.min.js","mathscribe/jqmath-etc-0.3.0.min.js","equations.js","contentscript.js"],
-      "css": ["mathscribe/jqmath-0.3.0.css","contentscript.css"],
-      "matches": [ "http://www.wolframalpha.com/input/*","https://www.wolframalpha.com/input/*"]
+      "js": [ "mathscribe/jquery-1.9.1.min.js", "mathscribe/jquery-migrate-1.1.1.min.js", "mathscribe/jqmath-etc-0.3.0.min.js", "equations.js", "wolfram.js" ],
+      "css": [ "mathscribe/jqmath-0.3.0.css", "wolfram.css" ],
+      "matches": [ "http://www.wolframalpha.com/input/*", "https://www.wolframalpha.com/input/*" ]
    } ],
   "permissions": [
     "storage"
   ],
+  "optional_permissions": [ "tabs", "http://*/*", "https://*/*" ],
   "icons": { "48": "icon48.png",
              "128": "icon128.png"
   },
