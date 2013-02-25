@@ -80,13 +80,13 @@ window.onload = ->
             else
               break
           table = "(\\table #{ rows.join(';') })"
-          s = s[0...idx] + table + s[bracketEnd+1...]
+          s = s[...idx] + table + s[bracketEnd+1...]
     return s
 
   changeBrackets = (string,startPos,endPos,prefix='',middle='') ->
     if not middle
       middle = string[startPos+1...endPos]
-    string = string[0...startPos]+prefix+'{'+middle+'}'+string[endPos+1...]
+    string = string[...startPos]+prefix+'{'+middle+'}'+string[endPos+1...]
     return string
 
   String.prototype.repeat = (num) ->
@@ -108,7 +108,7 @@ window.onload = ->
       scrollTop = field.scrollTop
 
       field.value = "
-#{ field.value[0...startPos] }
+#{ field.value[...startPos] }
 #{ value }
 #{ field.value[endPos...field.value.length] }"
       
@@ -255,7 +255,7 @@ window.onload = ->
       # Close all brackets
       if event.shiftKey and keyCodeMap[event.keyCode] == ']'
         startPos = inputBox.selectionStart
-        value = inputBox.value[0...startPos]
+        value = inputBox.value[...startPos]
 
         bracketsNo = 0
         for i in value
