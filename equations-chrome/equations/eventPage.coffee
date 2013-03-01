@@ -1,6 +1,6 @@
 loadEquations = (tabId, tab) ->
   storeURL = 'https://chrome.google.com/webstore'
-  getInputBoxes = "inputBoxes = document.querySelectorAll('input[id^=AnSwEr]')"
+  getInputBoxes = "inputBoxes = document.querySelectorAll('input[id*=AnSwEr]')"
 
   if tab.url[...4] == 'http' and tab.url[...storeURL.length] != storeURL
     chrome.tabs.executeScript tabId,

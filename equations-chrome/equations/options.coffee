@@ -10,6 +10,8 @@ window.onload = ->
 
   enableWebwork.onclick = ->
     if enableWebwork.checked
-      chrome.permissions.request permissions
+      chrome.permissions.request permissions, (granted) ->
+        if not granted
+          enableWebwork.checked = false
     else
       chrome.permissions.remove permissions

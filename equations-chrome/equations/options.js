@@ -15,7 +15,11 @@
     });
     return enableWebwork.onclick = function() {
       if (enableWebwork.checked) {
-        return chrome.permissions.request(permissions);
+        return chrome.permissions.request(permissions, function(granted) {
+          if (!granted) {
+            return enableWebwork.checked = false;
+          }
+        });
       } else {
         return chrome.permissions.remove(permissions);
       }
