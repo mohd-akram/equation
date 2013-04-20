@@ -146,7 +146,7 @@ window.onload = ->
     value = inputBox.value.replace(/\s/g, '')
                           .replace(/\$/g, '')
                           .replace(/\\bo|\\it|\\bi/g, '')
-                          .replace(/\\sc|\\fr/g, '')
+                          .replace(/\\sc|\\fr|\\ov/g, '')
                           .replace(/\\table|\\text|\\html/g, '')
                           .replace(/\\+$/, '')
 

@@ -1,4 +1,3 @@
-M.MathML = false
 window.onload = ->
   inputBox = document.getElementById('inputBox')
   equationBox = document.getElementById('equationBox')
