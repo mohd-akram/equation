@@ -7,18 +7,16 @@ loadEquations = (tabId, tab) ->
       code: getInputBoxes, (result) ->
         if Object.keys(result[0]).length != 0
           chrome.tabs.insertCSS tabId,
-            file: "mathscribe/jqmath-0.3.0.css"
+            file: "mathscribe/jqmath-0.4.0.css"
 
           chrome.tabs.executeScript tabId,
-            file: "mathscribe/jquery-1.9.1.min.js", ->
+            file: "mathscribe/jquery-2.0.0.min.js", ->
               chrome.tabs.executeScript tabId,
-                file: "mathscribe/jquery-migrate-1.1.1.min.js", ->
+                file: "mathscribe/jqmath-etc-0.4.0.min.js", ->
                   chrome.tabs.executeScript tabId,
-                    file: "mathscribe/jqmath-etc-0.3.0.min.js", ->
+                    file: "equations.js", ->
                       chrome.tabs.executeScript tabId,
-                        file: "equations.js", ->
-                          chrome.tabs.executeScript tabId,
-                            file: "webwork.js"
+                        file: "webwork.js"
 
 chrome.tabs.onUpdated.addListener (tabId, changeInfo, tab) ->
   if changeInfo.status == 'complete'
