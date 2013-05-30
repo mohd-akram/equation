@@ -11,7 +11,7 @@ Download the repository and open equations.html.
 
 **Libraries used**
 
-jqMath 0.3.0 (depends on jQuery)
+jqMath 0.4.0 (depends on jQuery)
 
 **License**
 
