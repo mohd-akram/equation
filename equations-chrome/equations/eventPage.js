@@ -16,7 +16,7 @@
             file: "mathscribe/jqmath-0.4.0.css"
           });
           return chrome.tabs.executeScript(tabId, {
-            file: "mathscribe/jquery-2.0.0.min.js"
+            file: "mathscribe/jquery-2.0.1.min.js"
           }, function() {
             return chrome.tabs.executeScript(tabId, {
               file: "mathscribe/jqmath-etc-0.4.0.min.js"

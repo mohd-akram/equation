@@ -142,10 +142,10 @@
       }
     };
     parseMatrices = function(string) {
-      var bracketEnd, c, idx, innerBracketStart, opening, rowEnd, rowStart, rows, s, table, _j, _len1;
+      var bracketEnd, c, idx, innerBracketStart, opening, rowEnd, rowStart, rows, s, table, _j;
 
       s = string;
-      for (idx = _j = 0, _len1 = s.length; _j < _len1; idx = ++_j) {
+      for (idx = _j = s.length - 1; _j >= 0; idx = _j += -1) {
         c = s[idx];
         if (s.slice(idx, idx + 2) === '((') {
           bracketEnd = findBracket(s, idx);
@@ -353,6 +353,10 @@
         } else {
           return insertAtCursor(inputBox, chars[char]);
         }
+      } else {
+        return setTimeout((function() {
+          return updateMath();
+        }), 0);
       }
     };
     return inputBox.onkeyup = function(event) {
@@ -361,10 +365,9 @@
       keyCode = event.keyCode;
       if (keyCode >= 65 && keyCode <= 90) {
         if (needBracket()) {
-          insertAtCursor(inputBox, '(');
+          return insertAtCursor(inputBox, '(');
         }
       }
-      return updateMath();
     };
   };
 

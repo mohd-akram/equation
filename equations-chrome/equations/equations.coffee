@@ -67,7 +67,7 @@ window.startEquations = (inputBox,equationBox,message='',storeEq=false) ->
 
   parseMatrices = (string) ->
     s = string
-    for c, idx in s
+    for c, idx in s by -1
       if s[idx...idx+2] == '(('
         bracketEnd = findBracket(s, idx)
         innerBracketStart = findBracket(s,bracketEnd-1,opening=true)
@@ -130,7 +130,7 @@ window.startEquations = (inputBox,equationBox,message='',storeEq=false) ->
     if keys
       length = keys.length
       startIdx = 0
-      if length>1
+      if length > 1
         char = keys[length-1]
         for i in [length-1...-1] by -1
           if keys[i] != char
@@ -138,7 +138,7 @@ window.startEquations = (inputBox,equationBox,message='',storeEq=false) ->
             break
 
         power = length-startIdx
-        if power>1
+        if power > 1
           insertAtCursor(inputBox,char+'^'+power.toString(),power)
          
     keys = []
@@ -164,15 +164,15 @@ window.startEquations = (inputBox,equationBox,message='',storeEq=false) ->
             endPos = findBracket(value,startPos)
             if endPos
               # Limit underscript adjustment
-              if func=='lim'
+              if func == 'lim'
                 value = changeBrackets(value,startPos,endPos,'↙')
 
               # Functions with overscript and underscript
-              else if func=='int' or func=='sum'
+              else if func == 'int' or func == 'sum'
                 args = value[startPos+1...endPos]
                 argsList = args.split(',')
 
-                if argsList.length==2
+                if argsList.length == 2
                   [under,over] =  argsList
                   value = changeBrackets(value,startPos,endPos,
                                          '↙',under+'}↖{'+over)
@@ -183,7 +183,7 @@ window.startEquations = (inputBox,equationBox,message='',storeEq=false) ->
       # Remove parentheses before division sign
       indexes = findAllIndexes(value,'/')
       for j in indexes
-        if value[j-1]==')'
+        if value[j-1] == ')'
           endPos = j-1
           startPos = findBracket(value,endPos,opening=true)
           if endPos
@@ -256,11 +256,15 @@ window.startEquations = (inputBox,equationBox,message='',storeEq=false) ->
           if i == ')'
             bracketsNo -= 1
 
-        if bracketsNo>0
+        if bracketsNo > 0
           insertAtCursor(inputBox,')'.repeat(bracketsNo))
       
       else
         insertAtCursor(inputBox, chars[char])
+
+    else
+      # Update the equation box immediately instead of waiting for keyup
+      setTimeout((-> updateMath()), 0)
 
   # On key up event
   inputBox.onkeyup = (event) ->
@@ -270,8 +274,6 @@ window.startEquations = (inputBox,equationBox,message='',storeEq=false) ->
     if (keyCode >= 65 and keyCode <= 90)
       if needBracket()
         insertAtCursor(inputBox,'(')
-
-    updateMath()
 
 window.stopEquations = (inputBox,equationBox,message='') ->
 
