@@ -10,9 +10,19 @@ window.onload = ->
   chars = {'[':'(',']':')',"'":'*',';':'+','`':"'",'up':'^(','down':'_'}
 
   lettersregex = {
-    'alpha':'α','beta':'β','gamma':'γ','delta':'δ',
-    'Delta':'Δ','epsilon':'ε','lambda':'λ','mu':'μ','pi':'π','theta':'θ',
-    'sigma':'σ','Sigma':'∑','tau':'τ','omega':'ω','Omega':'Ω','inf':'\∞'}
+    'Alpha':'Α','alpha':'α','Beta':'Β','beta':'β','Gamma':'Γ','gamma':'γ',
+    'Delta':'Δ','delta':'δ','Epsilon':'Ε','epsilon':'ε','Zeta':'Ζ','zeta':'ζ',
+    'Eta':'Η','Theta':'Θ','theta':'θ','Iota':'Ι','iota':'ι',
+    'Kappa':'Κ','kappa':'κ','Lambda':'Λ','lambda':'λ','Mu':'Μ','mu':'μ',
+    'Nu':'Ν','nu':'ν','Xi':'Ξ','xi':'ξ','Omicron':'Ο','omicron':'ο',
+    'Pi':'Π','pi':'π','Rho':'Ρ','rho':'ρ','Sigma':'∑','sigma':'σ',
+    'Tau':'Τ','tau':'τ','Upsilon':'Υ','upsilon':'υ','Phi':'Φ','phi':'φ',
+    'Chi':'Χ','chi':'χ','Psi':'Ψ','Omega':'Ω','omega':'ω',
+    'inf':'∞'
+  }
+  letters2regex = {'eta':'η','psi':'ψ','del':'∇'}
+
+  deltavars = ['x','y','t']
 
   trigfunctions = ['sin','cos','tan']
 
@@ -21,10 +31,16 @@ window.onload = ->
 
   miscregex = {
     '===':'≡','<-':'←','->':'→','<==':'⇐','==>':'⇒','<=':'≤',
-    '>=':'≥','!=':'≠','!<':'≮','!>':'≯','\\+-':'±','\\*':'×'}
-  
+    '>=':'≥','!=':'≠','!<':'≮','!>':'≯','\\+/-':'±','\\*':'×'}
+
+  filters = [
+    '\\$', '\\{', '\\}',
+    '\\\\bo', '\\\\it', '\\\\bi', '\\\\sc', '\\\\fr', '\\\\ov',
+    '\\\\table', '\\\\text', '\\\\html'
+  ]
+
   functions = trigfunctions
-  
+
   for i of funcregex
     functions.push i
 
@@ -32,7 +48,7 @@ window.onload = ->
 
   for i in trigfunctions
     trigregex['(arc)?'+i+'(h)?'] = '\\'+'$1'+i+'$2'
-  
+
   findAndReplace = (string,object) ->
     for i,j of object
       regex = new RegExp(i,"g")
@@ -46,7 +62,7 @@ window.onload = ->
         result.push(i)
 
     return result
-    
+
   findBracket = (string,startPos,opening=false) ->
     count = 0
     if opening
@@ -91,7 +107,7 @@ window.onload = ->
 
   String::repeat = (num) ->
     return new Array(num + 1).join(this)
- 
+
   insertAtCursor = (field,value,del = 0) ->
     # If IE
     if document.selection
@@ -111,7 +127,7 @@ window.onload = ->
 #{ field.value[...startPos] }
 #{ value }
 #{ field.value[endPos...field.value.length] }"
-      
+
       field.focus()
       field.selectionStart = startPos + value.length
       field.selectionEnd = startPos + value.length
@@ -138,17 +154,22 @@ window.onload = ->
         power = length-startIdx
         if power > 1
           insertAtCursor(inputBox,char+'^'+power.toString(),power)
-         
+
     keys = []
 
   updateMath = ->
-    # Get value without whitespace, trailing backslashes, \html macro
-    value = inputBox.value.replace(/\s/g, '')
-                          .replace(/\$/g, '')
-                          .replace(/\\bo|\\it|\\bi/g, '')
-                          .replace(/\\sc|\\fr|\\ov/g, '')
-                          .replace(/\\table|\\text|\\html/g, '')
-                          .replace(/\\+$/, '')
+    value = inputBox.value
+
+    for v in deltavars
+      for d in ['d', 'delta']
+        value = value.replace("/#{d}#{v}", "/(#{d}#{v})")
+
+    for f in filters
+      regex = new RegExp("\\\\*#{f}", 'g')
+      value = value.replace(regex, "#{f}")
+
+    # Remove whitespace and trailing backslashes
+    value = value.replace(/\s/g, '').replace(/\\+$/, '')
 
     value = parseMatrices(value)
 
@@ -177,21 +198,22 @@ window.onload = ->
 
               else
                 value = changeBrackets(value,startPos,endPos)
-      
+
       # Remove parentheses before division sign
       indexes = findAllIndexes(value,'/')
       for j in indexes
         if value[j-1] == ')'
           endPos = j-1
           startPos = findBracket(value,endPos,opening=true)
-          if endPos
+          if startPos?
             value = changeBrackets(value,startPos,endPos)
-                    
+
       value = findAndReplace(value,funcregex)
       value = findAndReplace(value,lettersregex)
+      value = findAndReplace(value,letters2regex)
       value = findAndReplace(value,trigregex)
       value = findAndReplace(value,miscregex)
-      
+
       # Escape string
       value = value.replace(/&/g, '&amp;')
                    .replace(/>/g, '&gt;')
@@ -214,8 +236,8 @@ window.onload = ->
       equationBox.style.fontSize = size.toString() + 'em'
 
       equationBox.innerHTML = '\$\$' + value + '\$\$'
-
       M.parseMath(equationBox)
+
     else
       equationBox.innerHTML = message
       equationBox.style.fontSize = fontSize.toString() + 'em'
@@ -249,7 +271,7 @@ window.onload = ->
       keys.push key
 
     char = keyCodeMap[event.keyCode]
-    
+
     if char of chars
       event.preventDefault()
       event.stopPropagation()
@@ -268,7 +290,7 @@ window.onload = ->
 
         if bracketsNo > 0
           insertAtCursor(inputBox,')'.repeat(bracketsNo))
-      
+
       else
         insertAtCursor(inputBox, chars[char])
 
