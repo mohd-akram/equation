@@ -1,7 +1,7 @@
 inputBox = document.getElementById('i')
 
 div = document.createElement('div')
-div.id = 'equationBox-checkbox'
+div.id = 'equationBox-icon'
 imgURL = chrome.extension.getURL("icon.png")
 
 div.innerHTML = "<a id=\"equationsEnabled\">
@@ -10,17 +10,19 @@ div.innerHTML = "<a id=\"equationsEnabled\">
 optionsDiv = document.getElementById('moreInput')
 optionsDiv.appendChild(div)
 
-checkbox = document.getElementById('equationsEnabled')
+wolframBox = document.getElementById('calculatecontain')
+equationsIcon = document.getElementById('equationsEnabled')
 
-checkbox.onclick = ->
+equation = null
+
+equationsIcon.onclick = ->
   equationBox = document.getElementById('equationBox-wolfram')
   if not equationBox
     equationBox = document.createElement('div')
     equationBox.id = 'equationBox-wolfram'
-    wolframBox = document.getElementById('calculatecontain')
+    equationBox.innerHTML = 'Type an equation above'
     wolframBox.appendChild(equationBox)
-    startEquations(inputBox,equationBox,"Type an equation above")
+    equation = new Equation(inputBox, equationBox)
   else
-    stopEquations(inputBox,equationBox)
-    parent = document.getElementById('calculatecontain')
-    parent.removeChild(equationBox)
+    equation.disable()
+    wolframBox.removeChild(equationBox)

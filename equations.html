@@ -32,6 +32,8 @@
         <input id="button" type="submit" value="WolframAlpha">
       </form>
     </div>
-	<script>var equation = new Equation()</script>
+    <script>var equation = new Equation(document.getElementById('inputBox'),
+                                        document.getElementById('equationBox'), true)
+    </script>
   </body>
 </html>

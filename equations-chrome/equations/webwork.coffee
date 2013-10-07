@@ -8,5 +8,5 @@ for inputBox in inputBoxes
   parent.insertBefore(equationBox, inputBox)
   parent.insertBefore(document.createElement('br'), inputBox)
   parent.insertBefore(document.createElement('br'), equationBox)
- 
-  startEquations(inputBox, equationBox)
+
+  equation = new Equation(inputBox, equationBox)
