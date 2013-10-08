@@ -2,10 +2,10 @@ loadEquations = (tabId, tab) ->
   storeURL = 'https://chrome.google.com/webstore'
   getInputBoxes = "inputBoxes = document.querySelectorAll('input[id*=AnSwEr]')"
 
-  if tab.url[...4] == 'http' and tab.url[...storeURL.length] != storeURL
+  if tab.url[...4] is 'http' and tab.url[...storeURL.length] isnt storeURL
     chrome.tabs.executeScript tabId,
       code: getInputBoxes, (result) ->
-        if Object.keys(result[0]).length != 0
+        if result[0].length > 0
           chrome.tabs.insertCSS tabId,
             file: "mathscribe/jqmath-0.4.0.css"
 
@@ -19,10 +19,8 @@ loadEquations = (tabId, tab) ->
                         file: "webwork.js"
 
 chrome.tabs.onUpdated.addListener (tabId, changeInfo, tab) ->
-  if changeInfo.status == 'complete'
+  if changeInfo.status is 'complete'
     chrome.permissions.contains
       permissions: ['tabs']
       origins: ["http://*/*", "https://*/*"],
-      (permitted) ->
-        if permitted
-          loadEquations(tabId, tab)
+      (permitted) -> loadEquations(tabId, tab) if permitted

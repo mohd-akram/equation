@@ -1,54 +1,54 @@
 root = exports ? this
 
-String::repeat = (num) ->
-  return new Array(num + 1).join(this)
-
 class Equation
-  @chars: {'[':'(',']':')',"'":'*',';':'+','`':"'",'up':'^(','down':'_'}
+  @chars:
+    '[': '(', ']': ')', "'": '*', ';': '+', '`': "'", 'up': '^(', 'down': '_'
 
-  @keyCodeMap: {
-    8:"backspace", 38:"up", 40:"down", 59:";", 186:";",
-    192:'`', 219:"[", 221:"]", 222:"'"}
+  @keyCodeMap:
+    8: 'backspace', 38: 'up', 40: 'down',
+    59: ';', 186: ';', 192: '`', 219: '[', 221: ']', 222: "'"
 
-  @lettersregex: {
-    'Alpha':'Α','alpha':'α','Beta':'Β','beta':'β','Gamma':'Γ','gamma':'γ',
-    'Delta':'Δ','delta':'δ','Epsilon':'Ε','epsilon':'ε','Zeta':'Ζ','zeta':'ζ',
-    'Eta':'Η','Theta':'Θ','theta':'θ','Iota':'Ι','iota':'ι',
-    'Kappa':'Κ','kappa':'κ','Lambda':'Λ','lambda':'λ','Mu':'Μ','mu':'μ',
-    'Nu':'Ν','nu':'ν','Xi':'Ξ','xi':'ξ','Omicron':'Ο','omicron':'ο',
-    'Pi':'Π','pi':'π','Rho':'Ρ','rho':'ρ','Sigma':'∑','sigma':'σ',
-    'Tau':'Τ','tau':'τ','Upsilon':'Υ','upsilon':'υ','Phi':'Φ','phi':'φ',
-    'Chi':'Χ','chi':'χ','Psi':'Ψ','Omega':'Ω','omega':'ω',
-    'inf':'∞'
-  }
-  @letters2regex: {'eta':'η','psi':'ψ','del':'∇'}
+  @lettersregex:
+    'Alpha': 'Α', 'alpha': 'α', 'Beta': 'Β', 'beta': 'β'
+    'Gamma': 'Γ', 'gamma': 'γ', 'Delta': 'Δ', 'delta': 'δ'
+    'Epsilon': 'Ε', 'epsilon': 'ε', 'Zeta': 'Ζ', 'zeta': 'ζ', 'Eta': 'Η'
+    'Theta': 'Θ', 'theta': 'θ', 'Iota': 'Ι', 'iota': 'ι'
+    'Kappa': 'Κ', 'kappa': 'κ', 'Lambda': 'Λ', 'lambda': 'λ'
+    'Mu': 'Μ', 'mu': 'μ', 'Nu': 'Ν', 'nu': 'ν', 'Xi': 'Ξ', 'xi': 'ξ'
+    'Omicron': 'Ο', 'omicron': 'ο', 'Pi': 'Π', 'pi': 'π'
+    'Rho': 'Ρ', 'rho': 'ρ', 'Sigma': '∑', 'sigma': 'σ', 'Tau': 'Τ', 'tau': 'τ'
+    'Upsilon': 'Υ', 'upsilon': 'υ', 'Phi': 'Φ', 'phi': 'φ'
+    'Chi': 'Χ', 'chi': 'χ', 'Psi': 'Ψ', 'Omega': 'Ω', 'omega': 'ω', 'inf': '∞'
 
-  @trigfunctions: ['sin','cos','tan']
+  @letters2regex: 'eta': 'η', 'psi': 'ψ', 'del': '∇'
 
-  @funcregex: {
-    'exp':'\\exp','log':'\\log','sqrt':'√','int':'∫','lim':'\\lim','sum':'∑'}
+  @funcregex:
+    'exp': '\\exp', 'log': '\\log', 'lim': '\\lim'
+    'sqrt': '√', 'int': '∫', 'sum': '∑'
 
-  @miscregex: {
-    '===':'≡','<-':'←','->':'→','<==':'⇐','==>':'⇒','<=':'≤',
-    '>=':'≥','!=':'≠','!<':'≮','!>':'≯','\\+/-':'±','\\*':'×'}
+  @trigfunctions: ['sin', 'cos', 'tan']
 
-  @deltavars: ['x','y','t']
+  @functions: Object.keys(Equation.funcregex).concat(Equation.trigfunctions)
+
+  @miscregex:
+    '===': '≡', '<-': '←', '->': '→', '<==': '⇐', '==>': '⇒', '<=': '≤'
+    '>=': '≥', '!=': '≠', '!<': '≮', '!>': '≯', '\\+/-': '±', '\\*': '×'
+
+  @deltavars: ['x', 'y', 't']
 
   @filters: [
-    '\\$', '\\{', '\\}',
-    '\\\\bo', '\\\\it', '\\\\bi', '\\\\sc', '\\\\fr', '\\\\ov',
+    '\\$', '\\{', '\\}'
+    '\\\\bo', '\\\\it', '\\\\bi', '\\\\sc', '\\\\fr', '\\\\ov'
     '\\\\table', '\\\\text', '\\\\html'
   ]
+
+  @trigregex: {}
+  for i in Equation.trigfunctions
+    @trigregex["(arc)?#{i}(h)?"] = "\\$1#{i}$2"
 
   constructor: (@inputBox, @equationBox, @resizeText=false, @callback=null) ->
     @fontSize = parseFloat @equationBox.style.fontSize
     @message = @equationBox.innerHTML
-
-    @functions = Equation.trigfunctions.concat(Object.keys(Equation.funcregex))
-
-    @trigregex = {}
-    for i in Equation.trigfunctions
-      @trigregex['(arc)?'+i+'(h)?'] = '\\'+'$1'+i+'$2'
 
     # Initialize key buffer and timeout. Used for exponent/power shortcut.
     @keys = []
@@ -57,14 +57,14 @@ class Equation
     @enable()
 
   findAndReplace: (string, object) ->
-    for i,j of object
-      regex = new RegExp(i,"g")
-      string = string.replace(regex,j)
+    for i, j of object
+      regex = new RegExp(i, "g")
+      string = string.replace(regex, j)
     return string
 
   findAllIndexes: (source, find) ->
     result = []
-    for i in [0...source.length-1]
+    for i in [0...source.length - 1]
       if source[i...i + find.length] is find
         result.push(i)
 
@@ -99,7 +99,7 @@ class Equation
             rowEnd = @findBracket(s, rowStart)
             rows.push(s[rowStart+1...rowEnd])
             if s[rowEnd+1] is ','
-              rowStart = rowEnd+2
+              rowStart = rowEnd + 2
             else
               break
           table = "(\\table #{ rows.join(';') })"
@@ -176,16 +176,16 @@ class Equation
 
     if value
       # Remove parentheses after functions/operations
-      for func in ['sqrt','^','_','/','lim','int','sum']
+      for func in ['^', '_', '/', 'sqrt', 'lim', 'int', 'sum']
         indexes = @findAllIndexes(value, func)
         for i in indexes.reverse()
           startPos = i + func.length
           if value[startPos] is '('
-            endPos = @findBracket(value,startPos)
+            endPos = @findBracket(value, startPos)
             if endPos
               # Limit underscript adjustment
               if func is 'lim'
-                value = @changeBrackets(value,startPos,endPos,'↙')
+                value = @changeBrackets(value, startPos, endPos, '↙')
 
               # Functions with overscript and underscript
               else if func is 'int' or func is 'sum'
@@ -193,7 +193,7 @@ class Equation
                 argsList = args.split(',')
 
                 if argsList.length is 2
-                  [under,over] =  argsList
+                  [under, over] =  argsList
                   value = @changeBrackets(value, startPos, endPos,
                                          '↙', "#{under}}↖{#{over}")
 
@@ -201,19 +201,19 @@ class Equation
                 value = @changeBrackets(value, startPos, endPos)
 
       # Remove parentheses before division sign
-      indexes = @findAllIndexes(value,'/')
+      indexes = @findAllIndexes(value, '/')
       for j in indexes
         if value[j - 1] is ')'
           endPos = j - 1
-          startPos = @findBracket(value,endPos,opening=true)
+          startPos = @findBracket(value, endPos, true)
           if startPos?
-            value = @changeBrackets(value,startPos,endPos)
+            value = @changeBrackets(value, startPos, endPos)
 
-      value = @findAndReplace(value,Equation.funcregex)
-      value = @findAndReplace(value,Equation.lettersregex)
-      value = @findAndReplace(value,Equation.letters2regex)
-      value = @findAndReplace(value,@trigregex)
-      value = @findAndReplace(value,Equation.miscregex)
+      value = @findAndReplace(value, Equation.funcregex)
+      value = @findAndReplace(value, Equation.lettersregex)
+      value = @findAndReplace(value, Equation.letters2regex)
+      value = @findAndReplace(value, Equation.miscregex)
+      value = @findAndReplace(value, Equation.trigregex)
 
       # Escape string
       value = value.replace(/&/g, '&amp;')
@@ -247,13 +247,13 @@ class Equation
     if @callback
       @callback(@inputBox.value)
 
-  keyDownHandler: =>
+  keyDownHandler: (event) =>
     keyCode = event.keyCode
     key = String.fromCharCode(keyCode).toLowerCase()
 
     if (keyCode >= 65 and keyCode <= 90)
       clearTimeout(@powerTimeout)
-      @powerTimeout = setTimeout((=> @updateBox()),300)
+      @powerTimeout = setTimeout((=> @updateBox()), 300)
       @keys.push key
 
     char = Equation.keyCodeMap[event.keyCode]
@@ -275,7 +275,7 @@ class Equation
             bracketsNo -= 1
 
         if bracketsNo > 0
-          @insertAtCursor(@inputBox,')'.repeat(bracketsNo))
+          @insertAtCursor(@inputBox, new Array(bracketsNo + 1).join(')'))
 
       else
         @insertAtCursor(@inputBox, Equation.chars[char])
@@ -284,13 +284,17 @@ class Equation
       # Update the equation box immediately instead of waiting for keyup
       setTimeout((=> @updateMath()), 0)
 
-  keyUpHandler: =>
+  keyUpHandler: (event) =>
     keyCode = event.keyCode
 
     # Add bracket after functions
     if (keyCode >= 65 and keyCode <= 90)
       if @needBracket()
         @insertAtCursor(@inputBox, '(')
+
+  searchHandler: =>
+    if not @inputBox.value
+      @equationBox.innerHTML = @message
 
   enableShortcuts: ->
     @inputBox.addEventListener('keydown', @keyDownHandler, false)
@@ -302,6 +306,7 @@ class Equation
 
   enable: ->
     @enableShortcuts()
+    @inputBox.addEventListener('search', @searchHandler, false)
     @updateMath()
 
   disable: ->
@@ -315,7 +320,7 @@ class Equation
       if string is "#{f}h"
         return true
 
-    for f in @functions
+    for f in Equation.functions
       string = @inputBox.value[startPos - (f.length)...startPos]
       if string is f
         return true

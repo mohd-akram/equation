@@ -8,7 +8,7 @@
 
   div.id = 'equationBox-icon';
 
-  imgURL = chrome.extension.getURL("icon.png");
+  imgURL = chrome.extension.getURL('icon.png');
 
   div.innerHTML = "<a id=\"equationsEnabled\"><img src=\"" + imgURL + "\" alt=\"Quick Equations\"></a>";
 

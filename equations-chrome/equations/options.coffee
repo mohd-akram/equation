@@ -1,5 +1,5 @@
 window.onload = ->
-  enableWebwork = document.getElementById('enable-webwork')
+  enableWebwork = document.getElementById 'enable-webwork'
   permissions =
     permissions: ["tabs"]
     origins: ["http://*/*", "https://*/*"]
@@ -13,5 +13,4 @@ window.onload = ->
       chrome.permissions.request permissions, (granted) ->
         if not granted
           enableWebwork.checked = false
-    else
-      chrome.permissions.remove permissions
+    else chrome.permissions.remove permissions

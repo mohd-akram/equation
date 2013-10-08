@@ -11,7 +11,7 @@
       }
       equation = new Equation(inputBox, equationBox, false, function() {
         return chrome.storage.sync.set({
-          'equation': inputBox.value
+          equation: inputBox.value
         });
       });
       return inputBox.onsearch = function() {
@@ -21,8 +21,6 @@
           return chrome.tabs.create({
             url: url
           });
-        } else {
-          return equationBox.innerHTML = equation.message;
         }
       };
     });

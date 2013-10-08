@@ -10,7 +10,7 @@
       return chrome.tabs.executeScript(tabId, {
         code: getInputBoxes
       }, function(result) {
-        if (Object.keys(result[0]).length !== 0) {
+        if (result[0].length > 0) {
           chrome.tabs.insertCSS(tabId, {
             file: "mathscribe/jqmath-0.4.0.css"
           });

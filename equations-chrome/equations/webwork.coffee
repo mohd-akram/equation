@@ -1,7 +1,7 @@
 for inputBox in inputBoxes
   parent = inputBox.parentNode
 
-  equationBox = document.createElement('div')
+  equationBox = document.createElement 'div'
   equationBox.style.display = 'inline-block'
   equationBox.style.padding = '10px'
 
