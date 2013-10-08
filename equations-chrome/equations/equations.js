@@ -6,7 +6,7 @@
   root = typeof exports !== "undefined" && exports !== null ? exports : this;
 
   Equation = (function() {
-    var i, _i, _len, _ref;
+    var _this = this;
 
     Equation.chars = {
       '[': '(',
@@ -120,11 +120,16 @@
 
     Equation.trigregex = {};
 
-    _ref = Equation.trigfunctions;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      i = _ref[_i];
-      Equation.trigregex["(arc)?" + i + "(h)?"] = "\\$1" + i + "$2";
-    }
+    (function() {
+      var i, _i, _len, _ref, _results;
+      _ref = Equation.trigfunctions;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        i = _ref[_i];
+        _results.push(Equation.trigregex["(arc)?" + i + "(h)?"] = "\\$1" + i + "$2");
+      }
+      return _results;
+    })();
 
     function Equation(inputBox, equationBox, resizeText, callback) {
       this.inputBox = inputBox;
@@ -142,7 +147,7 @@
     }
 
     Equation.prototype.findAndReplace = function(string, object) {
-      var j, regex;
+      var i, j, regex;
       for (i in object) {
         j = object[i];
         regex = new RegExp(i, "g");
@@ -152,9 +157,9 @@
     };
 
     Equation.prototype.findAllIndexes = function(source, find) {
-      var result, _j, _ref1;
+      var i, result, _i, _ref;
       result = [];
-      for (i = _j = 0, _ref1 = source.length - 1; 0 <= _ref1 ? _j < _ref1 : _j > _ref1; i = 0 <= _ref1 ? ++_j : --_j) {
+      for (i = _i = 0, _ref = source.length - 1; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
         if (source.slice(i, i + find.length) === find) {
           result.push(i);
         }
@@ -163,7 +168,7 @@
     };
 
     Equation.prototype.findBracket = function(string, startPos, opening) {
-      var count, range, _j, _k, _l, _len1, _ref1, _results, _results1;
+      var count, i, range, _i, _j, _k, _len, _ref, _results, _results1;
       if (opening == null) {
         opening = false;
       }
@@ -171,18 +176,18 @@
       if (opening) {
         range = (function() {
           _results = [];
-          for (var _j = startPos; startPos <= -1 ? _j < -1 : _j > -1; startPos <= -1 ? _j++ : _j--){ _results.push(_j); }
+          for (var _i = startPos; startPos <= -1 ? _i < -1 : _i > -1; startPos <= -1 ? _i++ : _i--){ _results.push(_i); }
           return _results;
         }).apply(this);
       } else {
         range = (function() {
           _results1 = [];
-          for (var _k = startPos, _ref1 = string.length; startPos <= _ref1 ? _k < _ref1 : _k > _ref1; startPos <= _ref1 ? _k++ : _k--){ _results1.push(_k); }
+          for (var _j = startPos, _ref = string.length; startPos <= _ref ? _j < _ref : _j > _ref; startPos <= _ref ? _j++ : _j--){ _results1.push(_j); }
           return _results1;
         }).apply(this);
       }
-      for (_l = 0, _len1 = range.length; _l < _len1; _l++) {
-        i = range[_l];
+      for (_k = 0, _len = range.length; _k < _len; _k++) {
+        i = range[_k];
         if (string[i] === '(') {
           count += 1;
         }
@@ -196,9 +201,9 @@
     };
 
     Equation.prototype.parseMatrices = function(string) {
-      var bracketEnd, c, idx, innerBracketStart, rowEnd, rowStart, rows, s, table, _j;
+      var bracketEnd, c, idx, innerBracketStart, rowEnd, rowStart, rows, s, table, _i;
       s = string;
-      for (idx = _j = s.length - 1; _j >= 0; idx = _j += -1) {
+      for (idx = _i = s.length - 1; _i >= 0; idx = _i += -1) {
         c = s[idx];
         if (s.slice(idx, idx + 2) === '((') {
           bracketEnd = this.findBracket(s, idx);
@@ -267,13 +272,13 @@
     };
 
     Equation.prototype.updateBox = function() {
-      var char, length, power, startIdx, _j, _ref1;
+      var char, i, length, power, startIdx, _i, _ref;
       if (this.keys) {
         length = this.keys.length;
         startIdx = 0;
         if (length > 1) {
           char = this.keys[length - 1];
-          for (i = _j = _ref1 = length - 1; _j > -1; i = _j += -1) {
+          for (i = _i = _ref = length - 1; _i > -1; i = _i += -1) {
             if (this.keys[i] !== char) {
               startIdx = i + 1;
               break;
@@ -289,37 +294,38 @@
     };
 
     Equation.prototype.updateMath = function() {
-      var args, argsList, d, endPos, f, func, indexes, j, over, regex, size, startPos, under, v, value, _j, _k, _l, _len1, _len2, _len3, _len4, _len5, _len6, _m, _n, _o, _ref1, _ref2, _ref3, _ref4, _ref5;
+      var args, argsList, d, endPos, f, func, hasPower, i, indexes, j, over, regex, size, startPos, under, v, value, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _len5, _m, _n, _ref, _ref1, _ref2, _ref3, _ref4;
       value = this.inputBox.value;
-      _ref1 = Equation.deltavars;
-      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-        v = _ref1[_j];
-        _ref2 = ['d', 'delta'];
-        for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
-          d = _ref2[_k];
+      _ref = Equation.deltavars;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        v = _ref[_i];
+        _ref1 = ['d', 'delta'];
+        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+          d = _ref1[_j];
           value = value.replace("/" + d + v, "/(" + d + v + ")");
         }
       }
-      _ref3 = Equation.filters;
-      for (_l = 0, _len3 = _ref3.length; _l < _len3; _l++) {
-        f = _ref3[_l];
+      _ref2 = Equation.filters;
+      for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
+        f = _ref2[_k];
         regex = new RegExp("\\\\*" + f, 'g');
         value = value.replace(regex, "" + f);
       }
       value = value.replace(/\s/g, '').replace(/\\+$/, '');
       value = this.parseMatrices(value);
       if (value) {
-        _ref4 = ['^', '_', '/', 'sqrt', 'lim', 'int', 'sum'];
-        for (_m = 0, _len4 = _ref4.length; _m < _len4; _m++) {
-          func = _ref4[_m];
+        _ref3 = ['^', '_', '/', 'sqrt', 'lim', 'int', 'sum'];
+        for (_l = 0, _len3 = _ref3.length; _l < _len3; _l++) {
+          func = _ref3[_l];
           indexes = this.findAllIndexes(value, func);
-          _ref5 = indexes.reverse();
-          for (_n = 0, _len5 = _ref5.length; _n < _len5; _n++) {
-            i = _ref5[_n];
+          _ref4 = indexes.reverse();
+          for (_m = 0, _len4 = _ref4.length; _m < _len4; _m++) {
+            i = _ref4[_m];
             startPos = i + func.length;
             if (value[startPos] === '(') {
               endPos = this.findBracket(value, startPos);
               if (endPos) {
+                hasPower = value[endPos + 1] === '^';
                 if (func === 'lim') {
                   value = this.changeBrackets(value, startPos, endPos, '↙');
                 } else if (func === 'int' || func === 'sum') {
@@ -329,16 +335,19 @@
                     under = argsList[0], over = argsList[1];
                     value = this.changeBrackets(value, startPos, endPos, '↙', "" + under + "}↖{" + over);
                   }
-                } else {
+                } else if (!(func === '/' && hasPower)) {
                   value = this.changeBrackets(value, startPos, endPos);
+                  if (func === 'sqrt' && hasPower) {
+                    value = "" + value.slice(0, i) + "{" + value.slice(i, endPos) + "}" + value.slice(endPos);
+                  }
                 }
               }
             }
           }
         }
         indexes = this.findAllIndexes(value, '/');
-        for (_o = 0, _len6 = indexes.length; _o < _len6; _o++) {
-          j = indexes[_o];
+        for (_n = 0, _len5 = indexes.length; _n < _len5; _n++) {
+          j = indexes[_n];
           if (value[j - 1] === ')') {
             endPos = j - 1;
             startPos = this.findBracket(value, endPos, true);
@@ -377,7 +386,7 @@
     };
 
     Equation.prototype.keyDownHandler = function(event) {
-      var bracketsNo, char, key, keyCode, startPos, value, _j, _len1,
+      var bracketsNo, char, i, key, keyCode, startPos, value, _i, _len,
         _this = this;
       keyCode = event.keyCode;
       key = String.fromCharCode(keyCode).toLowerCase();
@@ -396,8 +405,8 @@
           startPos = this.inputBox.selectionStart;
           value = this.inputBox.value.slice(0, startPos);
           bracketsNo = 0;
-          for (_j = 0, _len1 = value.length; _j < _len1; _j++) {
-            i = value[_j];
+          for (_i = 0, _len = value.length; _i < _len; _i++) {
+            i = value[_i];
             if (i === '(') {
               bracketsNo += 1;
             }
@@ -456,19 +465,19 @@
     };
 
     Equation.prototype.needBracket = function() {
-      var f, startPos, string, _j, _k, _len1, _len2, _ref1, _ref2;
+      var f, startPos, string, _i, _j, _len, _len1, _ref, _ref1;
       startPos = this.inputBox.selectionStart;
-      _ref1 = Equation.trigfunctions;
-      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-        f = _ref1[_j];
+      _ref = Equation.trigfunctions;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        f = _ref[_i];
         string = this.inputBox.value.slice(startPos - (f.length + 1), startPos);
         if (string === ("" + f + "h")) {
           return true;
         }
       }
-      _ref2 = Equation.functions;
-      for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
-        f = _ref2[_k];
+      _ref1 = Equation.functions;
+      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+        f = _ref1[_j];
         string = this.inputBox.value.slice(startPos - f.length, startPos);
         if (string === f) {
           return true;
@@ -478,7 +487,7 @@
 
     return Equation;
 
-  })();
+  }).call(this);
 
   root.Equation = Equation;
 

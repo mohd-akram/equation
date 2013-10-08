@@ -43,8 +43,8 @@ class Equation
   ]
 
   @trigregex: {}
-  for i in Equation.trigfunctions
-    @trigregex["(arc)?#{i}(h)?"] = "\\$1#{i}$2"
+  do =>
+    @trigregex["(arc)?#{i}(h)?"] = "\\$1#{i}$2" for i in Equation.trigfunctions
 
   constructor: (@inputBox, @equationBox, @resizeText=false, @callback=null) ->
     @fontSize = parseFloat @equationBox.style.fontSize
@@ -183,6 +183,7 @@ class Equation
           if value[startPos] is '('
             endPos = @findBracket(value, startPos)
             if endPos
+              hasPower = value[endPos + 1] is '^'
               # Limit underscript adjustment
               if func is 'lim'
                 value = @changeBrackets(value, startPos, endPos, '↙')
@@ -197,8 +198,11 @@ class Equation
                   value = @changeBrackets(value, startPos, endPos,
                                          '↙', "#{under}}↖{#{over}")
 
-              else
+              else if not (func is '/' and hasPower)
                 value = @changeBrackets(value, startPos, endPos)
+                if func is 'sqrt' and hasPower
+                  value = "#{value[...i]}{#{value[i...endPos]}}#{
+                    value[endPos...]}"
 
       # Remove parentheses before division sign
       indexes = @findAllIndexes(value, '/')
@@ -263,7 +267,7 @@ class Equation
       event.stopPropagation()
 
       # Close all brackets
-      if event.shiftKey and Equation.keyCodeMap[event.keyCode] == ']'
+      if event.shiftKey and Equation.keyCodeMap[event.keyCode] is ']'
         startPos = @inputBox.selectionStart
         value = @inputBox.value[...startPos]
 
