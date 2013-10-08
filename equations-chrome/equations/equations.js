@@ -8,7 +8,7 @@
   Equation = (function() {
     var _this = this;
 
-    Equation.chars = {
+    Equation.shortcuts = {
       '[': '(',
       ']': ')',
       "'": '*',
@@ -16,18 +16,6 @@
       '`': "'",
       'up': '^(',
       'down': '_'
-    };
-
-    Equation.keyCodeMap = {
-      8: 'backspace',
-      38: 'up',
-      40: 'down',
-      59: ';',
-      186: ';',
-      192: '`',
-      219: '[',
-      221: ']',
-      222: "'"
     };
 
     Equation.lettersregex = {
@@ -138,6 +126,7 @@
       this.callback = callback != null ? callback : null;
       this.searchHandler = __bind(this.searchHandler, this);
       this.keyUpHandler = __bind(this.keyUpHandler, this);
+      this.keyPressHandler = __bind(this.keyPressHandler, this);
       this.keyDownHandler = __bind(this.keyDownHandler, this);
       this.fontSize = parseFloat(this.equationBox.style.fontSize);
       this.message = this.equationBox.innerHTML;
@@ -385,23 +374,40 @@
       }
     };
 
-    Equation.prototype.keyDownHandler = function(event) {
-      var bracketsNo, char, i, key, keyCode, startPos, value, _i, _len,
+    Equation.prototype.keyDownHandler = function(e) {
+      var key,
         _this = this;
-      keyCode = event.keyCode;
-      key = String.fromCharCode(keyCode);
-      if ((65 <= keyCode && keyCode <= 90) && !event.ctrlKey) {
+      switch (e.keyCode) {
+        case 38:
+          key = 'up';
+          break;
+        case 40:
+          key = 'down';
+      }
+      if (key != null) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.insertAtCursor(this.inputBox, Equation.shortcuts[key]);
+      }
+      return setTimeout((function() {
+        return _this.updateMath();
+      }), 0);
+    };
+
+    Equation.prototype.keyPressHandler = function(e) {
+      var bracketsNo, i, key, startPos, value, _i, _len,
+        _this = this;
+      key = String.fromCharCode(e.which);
+      if (/[A-Za-z]/.test(key) && !(e.altKey || e.ctrlKey || e.metaKey)) {
         clearTimeout(this.powerTimeout);
         this.powerTimeout = setTimeout((function() {
           return _this.updateBox();
         }), 300);
-        this.keys.push(key);
-      }
-      char = Equation.keyCodeMap[event.keyCode];
-      if (char in Equation.chars) {
-        event.preventDefault();
-        event.stopPropagation();
-        if (event.shiftKey && Equation.keyCodeMap[event.keyCode] === ']') {
+        return this.keys.push(key);
+      } else if (key in Equation.shortcuts || key === '}') {
+        e.preventDefault();
+        e.stopPropagation();
+        if (key === '}') {
           startPos = this.inputBox.selectionStart;
           value = this.inputBox.value.slice(0, startPos);
           bracketsNo = 0;
@@ -418,22 +424,15 @@
             return this.insertAtCursor(this.inputBox, new Array(bracketsNo + 1).join(')'));
           }
         } else {
-          return this.insertAtCursor(this.inputBox, Equation.chars[char]);
+          return this.insertAtCursor(this.inputBox, Equation.shortcuts[key]);
         }
-      } else {
-        return setTimeout((function() {
-          return _this.updateMath();
-        }), 0);
       }
     };
 
-    Equation.prototype.keyUpHandler = function(event) {
-      var keyCode;
-      keyCode = event.keyCode;
-      if (keyCode >= 65 && keyCode <= 90) {
-        if (this.needBracket()) {
-          return this.insertAtCursor(this.inputBox, '(');
-        }
+    Equation.prototype.keyUpHandler = function(e) {
+      var _ref;
+      if ((65 <= (_ref = e.keyCode) && _ref <= 90) && this.needBracket()) {
+        return this.insertAtCursor(this.inputBox, '(');
       }
     };
 
@@ -445,11 +444,13 @@
 
     Equation.prototype.enableShortcuts = function() {
       this.inputBox.addEventListener('keydown', this.keyDownHandler, false);
+      this.inputBox.addEventListener('keypress', this.keyPressHandler, false);
       return this.inputBox.addEventListener('keyup', this.keyUpHandler, false);
     };
 
     Equation.prototype.disableShortcuts = function() {
       this.inputBox.removeEventListener('keydown', this.keyDownHandler, false);
+      this.inputBox.removeEventListener('keypress', this.keyPressHandler, false);
       return this.inputBox.removeEventListener('keyup', this.keyUpHandler, false);
     };
 
@@ -461,6 +462,7 @@
 
     Equation.prototype.disable = function() {
       this.disableShortcuts();
+      this.inputBox.removeEventListener('search', this.searchHandler, false);
       return this.equationBox.innerHTML = this.message;
     };
 

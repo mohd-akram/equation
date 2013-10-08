@@ -1,12 +1,8 @@
 root = exports ? this
 
 class Equation
-  @chars:
+  @shortcuts:
     '[': '(', ']': ')', "'": '*', ';': '+', '`': "'", 'up': '^(', 'down': '_'
-
-  @keyCodeMap:
-    8: 'backspace', 38: 'up', 40: 'down',
-    59: ';', 186: ';', 192: '`', 219: '[', 221: ']', 222: "'"
 
   @lettersregex:
     'Alpha': 'Α', 'alpha': 'α', 'Beta': 'Β', 'beta': 'β'
@@ -251,23 +247,33 @@ class Equation
     if @callback
       @callback(@inputBox.value)
 
-  keyDownHandler: (event) =>
-    keyCode = event.keyCode
-    key = String.fromCharCode keyCode
+  keyDownHandler: (e) =>
+    switch e.keyCode
+      when 38 then key = 'up'
+      when 40 then key = 'down'
 
-    if 65 <= keyCode <= 90 and not event.ctrlKey
+    if key?
+      e.preventDefault()
+      e.stopPropagation()
+      @insertAtCursor(@inputBox, Equation.shortcuts[key])
+
+    # Update the equation box immediately instead of waiting for keyup
+    setTimeout((=> @updateMath()), 0)
+
+  keyPressHandler: (e) =>
+    key = String.fromCharCode e.which
+
+    if /[A-Za-z]/.test(key) and not (e.altKey or e.ctrlKey or e.metaKey)
       clearTimeout(@powerTimeout)
       @powerTimeout = setTimeout((=> @updateBox()), 300)
       @keys.push key
 
-    char = Equation.keyCodeMap[event.keyCode]
-
-    if char of Equation.chars
-      event.preventDefault()
-      event.stopPropagation()
+    else if key of Equation.shortcuts or key is '}'
+      e.preventDefault()
+      e.stopPropagation()
 
       # Close all brackets
-      if event.shiftKey and Equation.keyCodeMap[event.keyCode] is ']'
+      if key is '}'
         startPos = @inputBox.selectionStart
         value = @inputBox.value[...startPos]
 
@@ -282,19 +288,12 @@ class Equation
           @insertAtCursor(@inputBox, new Array(bracketsNo + 1).join(')'))
 
       else
-        @insertAtCursor(@inputBox, Equation.chars[char])
+        @insertAtCursor(@inputBox, Equation.shortcuts[key])
 
-    else
-      # Update the equation box immediately instead of waiting for keyup
-      setTimeout((=> @updateMath()), 0)
-
-  keyUpHandler: (event) =>
-    keyCode = event.keyCode
-
+  keyUpHandler: (e) =>
     # Add bracket after functions
-    if (keyCode >= 65 and keyCode <= 90)
-      if @needBracket()
-        @insertAtCursor(@inputBox, '(')
+    if 65 <= e.keyCode <= 90 and @needBracket()
+      @insertAtCursor(@inputBox, '(')
 
   searchHandler: =>
     if not @inputBox.value
@@ -302,10 +301,12 @@ class Equation
 
   enableShortcuts: ->
     @inputBox.addEventListener('keydown', @keyDownHandler, false)
+    @inputBox.addEventListener('keypress', @keyPressHandler, false)
     @inputBox.addEventListener('keyup', @keyUpHandler, false)
 
   disableShortcuts: ->
     @inputBox.removeEventListener('keydown', @keyDownHandler, false)
+    @inputBox.removeEventListener('keypress', @keyPressHandler, false)
     @inputBox.removeEventListener('keyup', @keyUpHandler, false)
 
   enable: ->
@@ -315,6 +316,7 @@ class Equation
 
   disable: ->
     @disableShortcuts()
+    @inputBox.removeEventListener('search', @searchHandler, false)
     @equationBox.innerHTML = @message
 
   needBracket: ->
