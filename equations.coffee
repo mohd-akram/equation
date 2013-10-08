@@ -253,9 +253,9 @@ class Equation
 
   keyDownHandler: (event) =>
     keyCode = event.keyCode
-    key = String.fromCharCode(keyCode).toLowerCase()
+    key = String.fromCharCode keyCode
 
-    if (keyCode >= 65 and keyCode <= 90)
+    if 65 <= keyCode <= 90 and not event.ctrlKey
       clearTimeout(@powerTimeout)
       @powerTimeout = setTimeout((=> @updateBox()), 300)
       @keys.push key

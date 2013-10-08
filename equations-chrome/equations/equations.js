@@ -389,8 +389,8 @@
       var bracketsNo, char, i, key, keyCode, startPos, value, _i, _len,
         _this = this;
       keyCode = event.keyCode;
-      key = String.fromCharCode(keyCode).toLowerCase();
-      if (keyCode >= 65 && keyCode <= 90) {
+      key = String.fromCharCode(keyCode);
+      if ((65 <= keyCode && keyCode <= 90) && !event.ctrlKey) {
         clearTimeout(this.powerTimeout);
         this.powerTimeout = setTimeout((function() {
           return _this.updateBox();
