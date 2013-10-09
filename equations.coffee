@@ -4,6 +4,10 @@ class Equation
   @shortcuts:
     '[': '(', ']': ')', "'": '*', ';': '+', '`': "'", 'up': '^(', 'down': '_'
 
+  @symbolregex:
+    '===': '≡', '<-': '←', '->': '→', '<==': '⇐', '==>': '⇒', '<=': '≤'
+    '>=': '≥', '!=': '≠', '!<': '≮', '!>': '≯', '\\+/-': '±', '\\*': '×'
+
   @lettersregex:
     'Alpha': 'Α', 'alpha': 'α', 'Beta': 'Β', 'beta': 'β'
     'Gamma': 'Γ', 'gamma': 'γ', 'Delta': 'Δ', 'delta': 'δ'
@@ -26,16 +30,10 @@ class Equation
 
   @functions: Object.keys(Equation.funcregex).concat(Equation.trigfunctions)
 
-  @miscregex:
-    '===': '≡', '<-': '←', '->': '→', '<==': '⇐', '==>': '⇒', '<=': '≤'
-    '>=': '≥', '!=': '≠', '!<': '≮', '!>': '≯', '\\+/-': '±', '\\*': '×'
-
-  @deltavars: ['x', 'y', 't']
-
   @filters: [
     '\\$', '\\{', '\\}'
-    '\\\\bo', '\\\\it', '\\\\bi', '\\\\sc', '\\\\fr', '\\\\ov'
-    '\\\\table', '\\\\text', '\\\\html'
+    'bo', 'it', 'bi', 'sc', 'fr', 'ov'
+    'table', 'text', 'html'
   ]
 
   @trigregex: {}
@@ -54,7 +52,7 @@ class Equation
 
   findAndReplace: (string, object) ->
     for i, j of object
-      regex = new RegExp(i, "g")
+      regex = new RegExp(i, 'g')
       string = string.replace(regex, j)
     return string
 
@@ -98,9 +96,39 @@ class Equation
               rowStart = rowEnd + 2
             else
               break
-          table = "(\\table #{ rows.join(';') })"
+          table = "(\\table #{rows.join ';'})"
           s = s[...idx] + table + s[bracketEnd+1...]
     return s
+
+  parseFunction: (string, func) ->
+    indexes = @findAllIndexes(string, func)
+    for i in indexes.reverse()
+      startPos = i + func.length
+      if string[startPos] is '('
+        endPos = @findBracket(string, startPos)
+        if endPos
+          hasPower = string[endPos + 1] is '^'
+          # Limit underscript adjustment
+          if func is 'lim'
+            string = @changeBrackets(string, startPos, endPos, '↙')
+
+          # Functions with overscript and underscript
+          else if func is '∫' or func is '∑'
+            args = string[startPos + 1...endPos]
+            argsList = args.split ','
+
+            if argsList.length is 2
+              [under, over] =  argsList
+              string = @changeBrackets(string, startPos, endPos,
+                                     '↙', "#{under}}↖{#{over}")
+
+          else if not (func is '/' and hasPower)
+            string = @changeBrackets(string, startPos, endPos)
+            if func is '√' and hasPower
+              string = "#{string[...i]}{#{string[i...endPos]}}#{
+                string[endPos...]}"
+
+    return string
 
   changeBrackets: (string, startPos, endPos, prefix='', middle='') ->
     if not middle
@@ -157,13 +185,19 @@ class Equation
   updateMath: ->
     value = @inputBox.value
 
-    for v in Equation.deltavars
-      for d in ['d', 'delta']
-        value = value.replace("/#{d}#{v}", "/(#{d}#{v})")
-
     for f in Equation.filters
-      regex = new RegExp("\\\\*#{f}", 'g')
-      value = value.replace(regex, "#{f}")
+      regex = new RegExp("[\\s\\\\]*#{f}", 'g')
+      value = value.replace(regex, f)
+
+    value = @findAndReplace(value, Equation.symbolregex)
+    value = @findAndReplace(value, Equation.lettersregex)
+    value = @findAndReplace(value, Equation.letters2regex)
+    value = @findAndReplace(value, Equation.funcregex)
+    value = @findAndReplace(value, Equation.trigregex)
+    value = @parseFunction(value, 'lim')
+
+    regex = new RegExp('/(d|delta)(x|y|z|t)', 'g')
+    value = value.replace(regex, '/{$1$2}')
 
     # Remove whitespace and trailing backslashes
     value = value.replace(/\s/g, '').replace(/\\+$/, '')
@@ -172,33 +206,8 @@ class Equation
 
     if value
       # Remove parentheses after functions/operations
-      for func in ['^', '_', '/', 'sqrt', 'lim', 'int', 'sum']
-        indexes = @findAllIndexes(value, func)
-        for i in indexes.reverse()
-          startPos = i + func.length
-          if value[startPos] is '('
-            endPos = @findBracket(value, startPos)
-            if endPos
-              hasPower = value[endPos + 1] is '^'
-              # Limit underscript adjustment
-              if func is 'lim'
-                value = @changeBrackets(value, startPos, endPos, '↙')
-
-              # Functions with overscript and underscript
-              else if func is 'int' or func is 'sum'
-                args = value[startPos + 1...endPos]
-                argsList = args.split(',')
-
-                if argsList.length is 2
-                  [under, over] =  argsList
-                  value = @changeBrackets(value, startPos, endPos,
-                                         '↙', "#{under}}↖{#{over}")
-
-              else if not (func is '/' and hasPower)
-                value = @changeBrackets(value, startPos, endPos)
-                if func is 'sqrt' and hasPower
-                  value = "#{value[...i]}{#{value[i...endPos]}}#{
-                    value[endPos...]}"
+      for func in ['^', '_', '/', '√', '∫', '∑']
+        value = @parseFunction(value, func)
 
       # Remove parentheses before division sign
       indexes = @findAllIndexes(value, '/')
@@ -208,12 +217,6 @@ class Equation
           startPos = @findBracket(value, endPos, true)
           if startPos?
             value = @changeBrackets(value, startPos, endPos)
-
-      value = @findAndReplace(value, Equation.funcregex)
-      value = @findAndReplace(value, Equation.lettersregex)
-      value = @findAndReplace(value, Equation.letters2regex)
-      value = @findAndReplace(value, Equation.miscregex)
-      value = @findAndReplace(value, Equation.trigregex)
 
       # Escape string
       value = value.replace(/&/g, '&amp;')

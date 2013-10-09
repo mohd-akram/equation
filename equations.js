@@ -18,6 +18,21 @@
       'down': '_'
     };
 
+    Equation.symbolregex = {
+      '===': '≡',
+      '<-': '←',
+      '->': '→',
+      '<==': '⇐',
+      '==>': '⇒',
+      '<=': '≤',
+      '>=': '≥',
+      '!=': '≠',
+      '!<': '≮',
+      '!>': '≯',
+      '\\+/-': '±',
+      '\\*': '×'
+    };
+
     Equation.lettersregex = {
       'Alpha': 'Α',
       'alpha': 'α',
@@ -87,24 +102,7 @@
 
     Equation.functions = Object.keys(Equation.funcregex).concat(Equation.trigfunctions);
 
-    Equation.miscregex = {
-      '===': '≡',
-      '<-': '←',
-      '->': '→',
-      '<==': '⇐',
-      '==>': '⇒',
-      '<=': '≤',
-      '>=': '≥',
-      '!=': '≠',
-      '!<': '≮',
-      '!>': '≯',
-      '\\+/-': '±',
-      '\\*': '×'
-    };
-
-    Equation.deltavars = ['x', 'y', 't'];
-
-    Equation.filters = ['\\$', '\\{', '\\}', '\\\\bo', '\\\\it', '\\\\bi', '\\\\sc', '\\\\fr', '\\\\ov', '\\\\table', '\\\\text', '\\\\html'];
+    Equation.filters = ['\\$', '\\{', '\\}', 'bo', 'it', 'bi', 'sc', 'fr', 'ov', 'table', 'text', 'html'];
 
     Equation.trigregex = {};
 
@@ -139,7 +137,7 @@
       var i, j, regex;
       for (i in object) {
         j = object[i];
-        regex = new RegExp(i, "g");
+        regex = new RegExp(i, 'g');
         string = string.replace(regex, j);
       }
       return string;
@@ -217,6 +215,38 @@
       return s;
     };
 
+    Equation.prototype.parseFunction = function(string, func) {
+      var args, argsList, endPos, hasPower, i, indexes, over, startPos, under, _i, _len, _ref;
+      indexes = this.findAllIndexes(string, func);
+      _ref = indexes.reverse();
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        i = _ref[_i];
+        startPos = i + func.length;
+        if (string[startPos] === '(') {
+          endPos = this.findBracket(string, startPos);
+          if (endPos) {
+            hasPower = string[endPos + 1] === '^';
+            if (func === 'lim') {
+              string = this.changeBrackets(string, startPos, endPos, '↙');
+            } else if (func === '∫' || func === '∑') {
+              args = string.slice(startPos + 1, endPos);
+              argsList = args.split(',');
+              if (argsList.length === 2) {
+                under = argsList[0], over = argsList[1];
+                string = this.changeBrackets(string, startPos, endPos, '↙', "" + under + "}↖{" + over);
+              }
+            } else if (!(func === '/' && hasPower)) {
+              string = this.changeBrackets(string, startPos, endPos);
+              if (func === '√' && hasPower) {
+                string = "" + string.slice(0, i) + "{" + string.slice(i, endPos) + "}" + string.slice(endPos);
+              }
+            }
+          }
+        }
+      }
+      return string;
+    };
+
     Equation.prototype.changeBrackets = function(string, startPos, endPos, prefix, middle) {
       if (prefix == null) {
         prefix = '';
@@ -283,60 +313,33 @@
     };
 
     Equation.prototype.updateMath = function() {
-      var args, argsList, d, endPos, f, func, hasPower, i, indexes, j, over, regex, size, startPos, under, v, value, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _len5, _m, _n, _ref, _ref1, _ref2, _ref3, _ref4;
+      var endPos, f, func, indexes, j, regex, size, startPos, value, _i, _j, _k, _len, _len1, _len2, _ref, _ref1;
       value = this.inputBox.value;
-      _ref = Equation.deltavars;
+      _ref = Equation.filters;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        v = _ref[_i];
-        _ref1 = ['d', 'delta'];
-        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-          d = _ref1[_j];
-          value = value.replace("/" + d + v, "/(" + d + v + ")");
-        }
+        f = _ref[_i];
+        regex = new RegExp("[\\s\\\\]*" + f, 'g');
+        value = value.replace(regex, f);
       }
-      _ref2 = Equation.filters;
-      for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
-        f = _ref2[_k];
-        regex = new RegExp("\\\\*" + f, 'g');
-        value = value.replace(regex, "" + f);
-      }
+      value = this.findAndReplace(value, Equation.symbolregex);
+      value = this.findAndReplace(value, Equation.lettersregex);
+      value = this.findAndReplace(value, Equation.letters2regex);
+      value = this.findAndReplace(value, Equation.funcregex);
+      value = this.findAndReplace(value, Equation.trigregex);
+      value = this.parseFunction(value, 'lim');
+      regex = new RegExp('/(d|delta)(x|y|z|t)', 'g');
+      value = value.replace(regex, '/{$1$2}');
       value = value.replace(/\s/g, '').replace(/\\+$/, '');
       value = this.parseMatrices(value);
       if (value) {
-        _ref3 = ['^', '_', '/', 'sqrt', 'lim', 'int', 'sum'];
-        for (_l = 0, _len3 = _ref3.length; _l < _len3; _l++) {
-          func = _ref3[_l];
-          indexes = this.findAllIndexes(value, func);
-          _ref4 = indexes.reverse();
-          for (_m = 0, _len4 = _ref4.length; _m < _len4; _m++) {
-            i = _ref4[_m];
-            startPos = i + func.length;
-            if (value[startPos] === '(') {
-              endPos = this.findBracket(value, startPos);
-              if (endPos) {
-                hasPower = value[endPos + 1] === '^';
-                if (func === 'lim') {
-                  value = this.changeBrackets(value, startPos, endPos, '↙');
-                } else if (func === 'int' || func === 'sum') {
-                  args = value.slice(startPos + 1, endPos);
-                  argsList = args.split(',');
-                  if (argsList.length === 2) {
-                    under = argsList[0], over = argsList[1];
-                    value = this.changeBrackets(value, startPos, endPos, '↙', "" + under + "}↖{" + over);
-                  }
-                } else if (!(func === '/' && hasPower)) {
-                  value = this.changeBrackets(value, startPos, endPos);
-                  if (func === 'sqrt' && hasPower) {
-                    value = "" + value.slice(0, i) + "{" + value.slice(i, endPos) + "}" + value.slice(endPos);
-                  }
-                }
-              }
-            }
-          }
+        _ref1 = ['^', '_', '/', '√', '∫', '∑'];
+        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+          func = _ref1[_j];
+          value = this.parseFunction(value, func);
         }
         indexes = this.findAllIndexes(value, '/');
-        for (_n = 0, _len5 = indexes.length; _n < _len5; _n++) {
-          j = indexes[_n];
+        for (_k = 0, _len2 = indexes.length; _k < _len2; _k++) {
+          j = indexes[_k];
           if (value[j - 1] === ')') {
             endPos = j - 1;
             startPos = this.findBracket(value, endPos, true);
@@ -345,11 +348,6 @@
             }
           }
         }
-        value = this.findAndReplace(value, Equation.funcregex);
-        value = this.findAndReplace(value, Equation.lettersregex);
-        value = this.findAndReplace(value, Equation.letters2regex);
-        value = this.findAndReplace(value, Equation.miscregex);
-        value = this.findAndReplace(value, Equation.trigregex);
         value = value.replace(/&/g, '&amp;').replace(/>/g, '&gt;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
         if (this.resizeText) {
           if (value.length > 160) {
