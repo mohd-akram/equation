@@ -163,7 +163,7 @@
       if (opening) {
         range = (function() {
           _results = [];
-          for (var _i = startPos; startPos <= -1 ? _i < -1 : _i > -1; startPos <= -1 ? _i++ : _i--){ _results.push(_i); }
+          for (var _i = startPos; startPos <= 0 ? _i <= 0 : _i >= 0; startPos <= 0 ? _i++ : _i--){ _results.push(_i); }
           return _results;
         }).apply(this);
       } else {
@@ -233,12 +233,12 @@
               argsList = args.split(',');
               if (argsList.length === 2) {
                 under = argsList[0], over = argsList[1];
-                string = this.changeBrackets(string, startPos, endPos, '↙', "" + under + "}↖{" + over);
+                string = this.changeBrackets(string, startPos, endPos, '↙', "" + (this.removeSlashes(under)) + "}↖{" + over);
               }
             } else if (!(func === '/' && hasPower)) {
               string = this.changeBrackets(string, startPos, endPos);
               if (func === '√' && hasPower) {
-                string = "" + string.slice(0, i) + "{" + string.slice(i, endPos) + "}" + string.slice(endPos);
+                string = "" + (this.removeSlashes(string.slice(0, i))) + "{" + (this.removeSlashes(string.slice(i, endPos))) + "}" + string.slice(endPos);
               }
             }
           }
@@ -247,7 +247,12 @@
       return string;
     };
 
+    Equation.prototype.removeSlashes = function(string) {
+      return string.replace(/[\s\\]+$/, '');
+    };
+
     Equation.prototype.changeBrackets = function(string, startPos, endPos, prefix, middle) {
+      var prev;
       if (prefix == null) {
         prefix = '';
       }
@@ -257,8 +262,9 @@
       if (!middle) {
         middle = string.slice(startPos + 1, endPos);
       }
-      string = "" + string.slice(0, startPos) + prefix + "{" + middle + "}" + string.slice(endPos + 1);
-      return string;
+      prev = this.removeSlashes("" + string.slice(0, startPos) + prefix);
+      middle = this.removeSlashes(middle);
+      return "" + prev + "{" + middle + "}" + string.slice(endPos + 1);
     };
 
     Equation.prototype.insertAtCursor = function(field, value, del) {
@@ -297,7 +303,7 @@
         startIdx = 0;
         if (length > 1) {
           char = this.keys[length - 1];
-          for (i = _i = _ref = length - 1; _i > -1; i = _i += -1) {
+          for (i = _i = _ref = length - 1; _i >= 0; i = _i += -1) {
             if (this.keys[i] !== char) {
               startIdx = i + 1;
               break;
@@ -314,7 +320,7 @@
 
     Equation.prototype.updateMath = function() {
       var endPos, f, func, indexes, j, regex, size, startPos, value, _i, _j, _k, _len, _len1, _len2, _ref, _ref1;
-      value = this.inputBox.value.replace(/[\s\\]+$/, '');
+      value = this.removeSlashes(this.inputBox.value);
       _ref = Equation.filters;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         f = _ref[_i];

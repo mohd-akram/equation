@@ -67,7 +67,7 @@ class Equation
   findBracket: (string, startPos, opening=false) ->
     count = 0
     if opening
-      range = [startPos...-1]
+      range = [startPos..0]
     else
       range = [startPos...string.length]
 
@@ -83,21 +83,21 @@ class Equation
   parseMatrices: (string) ->
     s = string
     for c, idx in s by -1
-      if s[idx...idx+2] is '(('
+      if s[idx...idx + 2] is '(('
         bracketEnd = @findBracket(s, idx)
         innerBracketStart = @findBracket(s, bracketEnd - 1, true)
-        if s[innerBracketStart-1] is ',' or innerBracketStart is idx + 1
+        if s[innerBracketStart - 1] is ',' or innerBracketStart is idx + 1
           rows = []
           rowStart = idx + 1
           while true
             rowEnd = @findBracket(s, rowStart)
-            rows.push(s[rowStart+1...rowEnd])
-            if s[rowEnd+1] is ','
+            rows.push(s[rowStart + 1...rowEnd])
+            if s[rowEnd + 1] is ','
               rowStart = rowEnd + 2
             else
               break
           table = "(\\table #{rows.join ';'})"
-          s = s[...idx] + table + s[bracketEnd+1...]
+          s = s[...idx] + table + s[bracketEnd + 1...]
     return s
 
   parseFunction: (string, func) ->
@@ -120,21 +120,26 @@ class Equation
             if argsList.length is 2
               [under, over] =  argsList
               string = @changeBrackets(string, startPos, endPos,
-                                     '↙', "#{under}}↖{#{over}")
+                                     '↙', "#{@removeSlashes under}}↖{#{over}")
 
           else if not (func is '/' and hasPower)
             string = @changeBrackets(string, startPos, endPos)
             if func is '√' and hasPower
-              string = "#{string[...i]}{#{string[i...endPos]}}#{
-                string[endPos...]}"
+              string = "#{@removeSlashes string[...i]}{#{
+                @removeSlashes string[i...endPos]}}#{string[endPos...]}"
 
     return string
+
+  removeSlashes: (string) -> string.replace(/[\s\\]+$/, '')
 
   changeBrackets: (string, startPos, endPos, prefix='', middle='') ->
     if not middle
-      middle = string[startPos+1...endPos]
-    string = "#{string[...startPos]}#{prefix}{#{middle}}#{string[endPos+1...]}"
-    return string
+      middle = string[startPos + 1...endPos]
+
+    prev = @removeSlashes "#{string[...startPos]}#{prefix}"
+    middle = @removeSlashes middle
+
+    return "#{prev}{#{middle}}#{string[endPos + 1...]}"
 
   insertAtCursor: (field, value, del=0) ->
     # If IE
@@ -170,10 +175,10 @@ class Equation
       length = @keys.length
       startIdx = 0
       if length > 1
-        char = @keys[length-1]
-        for i in [length-1...-1] by -1
+        char = @keys[length - 1]
+        for i in [length - 1..0] by -1
           if @keys[i] isnt char
-            startIdx = i+1
+            startIdx = i + 1
             break
 
         power = length - startIdx
@@ -184,7 +189,7 @@ class Equation
 
   updateMath: ->
     # Get value and remove trailing backslashes
-    value = @inputBox.value.replace(/[\s\\]+$/, '')
+    value = @removeSlashes @inputBox.value
 
     # Remove macros and special characters
     for f in Equation.filters
