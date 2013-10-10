@@ -183,29 +183,32 @@ class Equation
     @keys = []
 
   updateMath: ->
-    value = @inputBox.value
+    # Get value and remove trailing backslashes
+    value = @inputBox.value.replace(/[\s\\]+$/, '')
 
+    # Remove macros and special characters
     for f in Equation.filters
       regex = new RegExp("[\\s\\\\]*#{f}", 'g')
       value = value.replace(regex, f)
 
+    # Display symbols, Greek letters and functions properly
     value = @findAndReplace(value, Equation.symbolregex)
     value = @findAndReplace(value, Equation.lettersregex)
     value = @findAndReplace(value, Equation.letters2regex)
     value = @findAndReplace(value, Equation.funcregex)
     value = @findAndReplace(value, Equation.trigregex)
-    value = @parseFunction(value, 'lim')
 
-    regex = new RegExp('/(d|delta)(x|y|z|t)', 'g')
+    # Allow d/dx without parentheses
+    regex = new RegExp('/(d|∂)(x|y|z|t)', 'g')
     value = value.replace(regex, '/{$1$2}')
 
-    # Remove whitespace and trailing backslashes
-    value = value.replace(/\s/g, '').replace(/\\+$/, '')
+    value = @parseFunction(value, 'lim')
 
-    value = @parseMatrices(value)
+    # Remove whitespace
+    value = value.replace(/\s/g, '')
 
     if value
-      # Remove parentheses after functions/operations
+      # Parse special functions/operations
       for func in ['^', '_', '/', '√', '∫', '∑']
         value = @parseFunction(value, func)
 
@@ -217,6 +220,8 @@ class Equation
           startPos = @findBracket(value, endPos, true)
           if startPos?
             value = @changeBrackets(value, startPos, endPos)
+
+      value = @parseMatrices(value)
 
       # Escape string
       value = value.replace(/&/g, '&amp;')
@@ -241,14 +246,13 @@ class Equation
         @equationBox.style.fontSize = "#{size}em"
 
       @equationBox.innerHTML = "$$#{value}$$"
-      M.parseMath(@equationBox)
+      M.parseMath @equationBox
 
     else
       @equationBox.innerHTML = @message
       @equationBox.style.fontSize = "#{@fontSize}em"
 
-    if @callback
-      @callback(@inputBox.value)
+    @callback(@inputBox.value) if @callback
 
   keyDownHandler: (e) =>
     switch e.keyCode

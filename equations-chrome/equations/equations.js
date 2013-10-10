@@ -314,7 +314,7 @@
 
     Equation.prototype.updateMath = function() {
       var endPos, f, func, indexes, j, regex, size, startPos, value, _i, _j, _k, _len, _len1, _len2, _ref, _ref1;
-      value = this.inputBox.value;
+      value = this.inputBox.value.replace(/[\s\\]+$/, '');
       _ref = Equation.filters;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         f = _ref[_i];
@@ -326,11 +326,10 @@
       value = this.findAndReplace(value, Equation.letters2regex);
       value = this.findAndReplace(value, Equation.funcregex);
       value = this.findAndReplace(value, Equation.trigregex);
-      value = this.parseFunction(value, 'lim');
-      regex = new RegExp('/(d|delta)(x|y|z|t)', 'g');
+      regex = new RegExp('/(d|∂)(x|y|z|t)', 'g');
       value = value.replace(regex, '/{$1$2}');
-      value = value.replace(/\s/g, '').replace(/\\+$/, '');
-      value = this.parseMatrices(value);
+      value = this.parseFunction(value, 'lim');
+      value = value.replace(/\s/g, '');
       if (value) {
         _ref1 = ['^', '_', '/', '√', '∫', '∑'];
         for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
@@ -348,6 +347,7 @@
             }
           }
         }
+        value = this.parseMatrices(value);
         value = value.replace(/&/g, '&amp;').replace(/>/g, '&gt;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
         if (this.resizeText) {
           if (value.length > 160) {
