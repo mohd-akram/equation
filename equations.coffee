@@ -5,10 +5,14 @@ class Equation
     '[': '(', ']': ')', "'": '*', ';': '+', '`': "'", 'up': '^(', 'down': '_'
 
   @symbolregex:
-    '===': '≡', '<-': '←', '->': '→', '<==': '⇐', '==>': '⇒', '<=': '≤'
-    '>=': '≥', '!=': '≠', '!<': '≮', '!>': '≯', '\\+/-': '±', '\\*': '×'
+    '===': '≡', '~~': '≈', '!=': '≠', '=/=': '≠'
+    '>=': '≥', '!<': '≮', '!>': '≯'
+    '<-': '←', '->': '→', '<==': '⇐', '==>': '⇒'
+    '\\+/-': '±', '\\*': '×'
 
-  @lettersregex:
+  @symbol2regex: '<=': '≤'
+
+  @letterregex:
     'Alpha': 'Α', 'alpha': 'α', 'Beta': 'Β', 'beta': 'β'
     'Gamma': 'Γ', 'gamma': 'γ', 'Delta': 'Δ', 'delta': 'δ'
     'Epsilon': 'Ε', 'epsilon': 'ε', 'Zeta': 'Ζ', 'zeta': 'ζ', 'Eta': 'Η'
@@ -20,7 +24,7 @@ class Equation
     'Upsilon': 'Υ', 'upsilon': 'υ', 'Phi': 'Φ', 'phi': 'φ'
     'Chi': 'Χ', 'chi': 'χ', 'Psi': 'Ψ', 'Omega': 'Ω', 'omega': 'ω', 'inf': '∞'
 
-  @letters2regex: 'eta': 'η', 'psi': 'ψ', 'del': '∇'
+  @letter2regex: 'eta': 'η', 'psi': 'ψ', 'del': '∇'
 
   @funcregex:
     'exp': '\\exp', 'log': '\\log', 'lim': '\\lim'
@@ -198,8 +202,9 @@ class Equation
 
     # Display symbols, Greek letters and functions properly
     value = @findAndReplace(value, Equation.symbolregex)
-    value = @findAndReplace(value, Equation.lettersregex)
-    value = @findAndReplace(value, Equation.letters2regex)
+    value = @findAndReplace(value, Equation.symbol2regex)
+    value = @findAndReplace(value, Equation.letterregex)
+    value = @findAndReplace(value, Equation.letter2regex)
     value = @findAndReplace(value, Equation.funcregex)
     value = @findAndReplace(value, Equation.trigregex)
 
@@ -209,8 +214,11 @@ class Equation
 
     value = @parseFunction(value, 'lim')
 
-    # Remove whitespace
-    value = value.replace(/\s/g, '')
+    # Remove whitespace except after escaped tokens
+    tokens = value.split /\s/
+    for token, i in tokens
+      tokens[i] = "#{token} " if token[0] is '\\'
+    value = tokens.join ''
 
     if value
       # Parse special functions/operations

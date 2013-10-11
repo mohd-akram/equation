@@ -20,20 +20,25 @@
 
     Equation.symbolregex = {
       '===': '≡',
+      '~~': '≈',
+      '!=': '≠',
+      '=/=': '≠',
+      '>=': '≥',
+      '!<': '≮',
+      '!>': '≯',
       '<-': '←',
       '->': '→',
       '<==': '⇐',
       '==>': '⇒',
-      '<=': '≤',
-      '>=': '≥',
-      '!=': '≠',
-      '!<': '≮',
-      '!>': '≯',
       '\\+/-': '±',
       '\\*': '×'
     };
 
-    Equation.lettersregex = {
+    Equation.symbol2regex = {
+      '<=': '≤'
+    };
+
+    Equation.letterregex = {
       'Alpha': 'Α',
       'alpha': 'α',
       'Beta': 'Β',
@@ -83,7 +88,7 @@
       'inf': '∞'
     };
 
-    Equation.letters2regex = {
+    Equation.letter2regex = {
       'eta': 'η',
       'psi': 'ψ',
       'del': '∇'
@@ -319,7 +324,7 @@
     };
 
     Equation.prototype.updateMath = function() {
-      var endPos, f, func, indexes, j, regex, size, startPos, value, _i, _j, _k, _len, _len1, _len2, _ref, _ref1;
+      var endPos, f, func, i, indexes, j, regex, size, startPos, token, tokens, value, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1;
       value = this.removeSlashes(this.inputBox.value);
       _ref = Equation.filters;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -328,23 +333,31 @@
         value = value.replace(regex, f);
       }
       value = this.findAndReplace(value, Equation.symbolregex);
-      value = this.findAndReplace(value, Equation.lettersregex);
-      value = this.findAndReplace(value, Equation.letters2regex);
+      value = this.findAndReplace(value, Equation.symbol2regex);
+      value = this.findAndReplace(value, Equation.letterregex);
+      value = this.findAndReplace(value, Equation.letter2regex);
       value = this.findAndReplace(value, Equation.funcregex);
       value = this.findAndReplace(value, Equation.trigregex);
       regex = new RegExp('/(d|∂)(x|y|z|t)', 'g');
       value = value.replace(regex, '/{$1$2}');
       value = this.parseFunction(value, 'lim');
-      value = value.replace(/\s/g, '');
+      tokens = value.split(/\s/);
+      for (i = _j = 0, _len1 = tokens.length; _j < _len1; i = ++_j) {
+        token = tokens[i];
+        if (token[0] === '\\') {
+          tokens[i] = "" + token + " ";
+        }
+      }
+      value = tokens.join('');
       if (value) {
         _ref1 = ['^', '_', '/', '√', '∫', '∑'];
-        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-          func = _ref1[_j];
+        for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
+          func = _ref1[_k];
           value = this.parseFunction(value, func);
         }
         indexes = this.findAllIndexes(value, '/');
-        for (_k = 0, _len2 = indexes.length; _k < _len2; _k++) {
-          j = indexes[_k];
+        for (_l = 0, _len3 = indexes.length; _l < _len3; _l++) {
+          j = indexes[_l];
           if (value[j - 1] === ')') {
             endPos = j - 1;
             startPos = this.findBracket(value, endPos, true);
