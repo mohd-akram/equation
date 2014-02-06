@@ -5,12 +5,12 @@
   loadEquations = function(tabId, tab) {
     var getInputBoxes, storeURL;
     storeURL = 'https://chrome.google.com/webstore';
-    getInputBoxes = "inputBoxes = document.querySelectorAll('input[id*=AnSwEr]')";
+    getInputBoxes = "inputBoxes = document.querySelectorAll('input[id*=AnSwEr]'); inputBoxes.length";
     if (tab.url.slice(0, 4) === 'http' && tab.url.slice(0, storeURL.length) !== storeURL) {
       return chrome.tabs.executeScript(tabId, {
         code: getInputBoxes
       }, function(result) {
-        if (result[0].length > 0) {
+        if (result[0] > 0) {
           chrome.tabs.insertCSS(tabId, {
             file: "mathscribe/jqmath-0.4.0.css"
           });

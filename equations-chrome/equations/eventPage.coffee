@@ -1,11 +1,12 @@
 loadEquations = (tabId, tab) ->
   storeURL = 'https://chrome.google.com/webstore'
-  getInputBoxes = "inputBoxes = document.querySelectorAll('input[id*=AnSwEr]')"
+  getInputBoxes = "inputBoxes = document.querySelectorAll('input[id*=AnSwEr]');
+                   inputBoxes.length"
 
   if tab.url[...4] is 'http' and tab.url[...storeURL.length] isnt storeURL
     chrome.tabs.executeScript tabId,
       code: getInputBoxes, (result) ->
-        if result[0].length > 0
+        if result[0] > 0
           chrome.tabs.insertCSS tabId,
             file: "mathscribe/jqmath-0.4.0.css"
 
