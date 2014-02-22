@@ -9,7 +9,7 @@ class Equation
     '>=': '≥', '!<': '≮', '!>': '≯'
     '<-': '←', '->': '→', '<==': '⇐', '==>': '⇒'
     '\\+/-': '±', '\\*': '×'
-    '\\^\\^': '\u0302', '\\^_': '\u0305'
+    '\\^\\^': '\u0302'
 
   @symbol2regex: '<=': '≤'
 
@@ -103,6 +103,36 @@ class Equation
               break
           table = "(\\table #{rows.join ';'})"
           s = s[...idx] + table + s[bracketEnd + 1...]
+    return s
+
+  parseOverbars: (string) ->
+    s = string
+    for c, idx in s by -1
+      if s[idx...idx + 2] is '^_' and idx > 0
+        # Remove the overbar operator
+        s = s[...idx] + s[idx + 2...]
+
+        if s[idx - 1] is ')'
+          bracketEnd = idx - 1
+          bracketStart = @findBracket(s, bracketEnd, true)
+          if not bracketStart?
+            continue
+        else
+          bracketEnd = idx + 1
+          bracketStart = idx - 1
+
+          # Place start bracket appropriately if number precedes operator
+          while (bracketStart >= 0 and
+                 not isNaN(parseFloat(s[bracketStart...idx])))
+            bracketStart -= 1
+          bracketStart += 1 if bracketStart < idx - 1
+
+          s = "#{s[...bracketStart]}(#{
+                 s[bracketStart...bracketEnd - 1]})#{
+                 s[bracketEnd - 1...]}"
+
+        s = @changeBrackets(s, bracketStart, bracketEnd, '\\ov')
+
     return s
 
   parseFunction: (string, func) ->
@@ -235,6 +265,7 @@ class Equation
           if startPos?
             value = @changeBrackets(value, startPos, endPos)
 
+      value = @parseOverbars(value)
       value = @parseMatrices(value)
 
       # Escape string

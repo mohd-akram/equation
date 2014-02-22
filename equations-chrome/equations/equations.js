@@ -30,8 +30,7 @@
       '==>': '⇒',
       '\\+/-': '±',
       '\\*': '×',
-      '\\^\\^': '\u0302',
-      '\\^_': '\u0305'
+      '\\^\\^': '\u0302'
     };
 
     Equation.symbol2regex = {
@@ -220,6 +219,36 @@
       return s;
     };
 
+    Equation.prototype.parseOverbars = function(string) {
+      var bracketEnd, bracketStart, c, idx, s, _i;
+      s = string;
+      for (idx = _i = s.length - 1; _i >= 0; idx = _i += -1) {
+        c = s[idx];
+        if (s.slice(idx, idx + 2) === '^_' && idx > 0) {
+          s = s.slice(0, idx) + s.slice(idx + 2);
+          if (s[idx - 1] === ')') {
+            bracketEnd = idx - 1;
+            bracketStart = this.findBracket(s, bracketEnd, true);
+            if (bracketStart == null) {
+              continue;
+            }
+          } else {
+            bracketEnd = idx + 1;
+            bracketStart = idx - 1;
+            while (bracketStart >= 0 && !isNaN(parseFloat(s.slice(bracketStart, idx)))) {
+              bracketStart -= 1;
+            }
+            if (bracketStart < idx - 1) {
+              bracketStart += 1;
+            }
+            s = "" + s.slice(0, bracketStart) + "(" + s.slice(bracketStart, bracketEnd - 1) + ")" + s.slice(bracketEnd - 1);
+          }
+          s = this.changeBrackets(s, bracketStart, bracketEnd, '\\ov');
+        }
+      }
+      return s;
+    };
+
     Equation.prototype.parseFunction = function(string, func) {
       var args, argsList, endPos, hasPower, i, indexes, over, startPos, under, _i, _len, _ref;
       indexes = this.findAllIndexes(string, func);
@@ -366,6 +395,7 @@
             }
           }
         }
+        value = this.parseOverbars(value);
         value = this.parseMatrices(value);
         value = value.replace(/&/g, '&amp;').replace(/>/g, '&gt;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
         if (this.resizeText) {
