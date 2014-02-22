@@ -235,11 +235,8 @@
           } else {
             bracketEnd = idx + 1;
             bracketStart = idx - 1;
-            while (bracketStart >= 0 && !isNaN(parseFloat(s.slice(bracketStart, idx)))) {
+            while (bracketStart - 1 >= 0 && !isNaN(Number(s.slice(bracketStart - 1, idx)))) {
               bracketStart -= 1;
-            }
-            if (bracketStart < idx - 1) {
-              bracketStart += 1;
             }
             s = "" + s.slice(0, bracketStart) + "(" + s.slice(bracketStart, bracketEnd - 1) + ")" + s.slice(bracketEnd - 1);
           }

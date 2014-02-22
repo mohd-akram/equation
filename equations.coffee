@@ -122,10 +122,8 @@ class Equation
           bracketStart = idx - 1
 
           # Place start bracket appropriately if number precedes operator
-          while (bracketStart >= 0 and
-                 not isNaN(parseFloat(s[bracketStart...idx])))
-            bracketStart -= 1
-          bracketStart += 1 if bracketStart < idx - 1
+          bracketStart -= 1 while (bracketStart - 1 >= 0 and
+                                   not isNaN(Number s[bracketStart - 1...idx]))
 
           s = "#{s[...bracketStart]}(#{
                  s[bracketStart...bracketEnd - 1]})#{
