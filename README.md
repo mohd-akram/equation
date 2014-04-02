@@ -12,9 +12,3 @@ Download the repository and open equations.html.
 **Libraries used**
 
 jqMath 0.4.0 (depends on jQuery)
-
-**License**
-
-Main editor: Do whatever you want with it
-
-Chrome extension: For personal use only
