@@ -10,7 +10,7 @@ div.innerHTML = "<a id=\"equationsEnabled\">
 optionsDiv = document.getElementById 'moreInput'
 optionsDiv.appendChild div
 
-wolframBox = document.getElementById 'calculatecontain'
+wolframBox = document.getElementById 'results'
 equationsIcon = document.getElementById 'equationsEnabled'
 
 equation = null
@@ -21,7 +21,7 @@ equationsIcon.onclick = ->
     equationBox = document.createElement 'div'
     equationBox.id = 'equationBox-wolfram'
     equationBox.innerHTML = 'Type an equation above'
-    wolframBox.appendChild equationBox
+    wolframBox.insertBefore equationBox, wolframBox.firstChild
     equation = new Equation(inputBox, equationBox)
   else
     equation.disable()

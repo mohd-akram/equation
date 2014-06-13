@@ -16,7 +16,7 @@
 
   optionsDiv.appendChild(div);
 
-  wolframBox = document.getElementById('calculatecontain');
+  wolframBox = document.getElementById('results');
 
   equationsIcon = document.getElementById('equationsEnabled');
 
@@ -29,7 +29,7 @@
       equationBox = document.createElement('div');
       equationBox.id = 'equationBox-wolfram';
       equationBox.innerHTML = 'Type an equation above';
-      wolframBox.appendChild(equationBox);
+      wolframBox.insertBefore(equationBox, wolframBox.firstChild);
       return equation = new Equation(inputBox, equationBox);
     } else {
       equation.disable();
