@@ -123,7 +123,7 @@
 
     Equation.funcops = Object.keys(Equation.opregex).concat(Equation.functions);
 
-    Equation.filters = ['\\$', '\\{', '\\}', 'bo', 'it', 'bi', 'sc', 'fr', 'ov', 'table', 'text', 'html'];
+    Equation.filters = ['\\$', '\\{', '\\}', 'bo', 'it', 'bi', 'sc', 'fr', 'ov', 'table', 'text', 'html', ',', ':', ';'];
 
     function Equation(inputBox, equationBox, resizeText, callback) {
       this.inputBox = inputBox;
@@ -305,7 +305,7 @@
     };
 
     Equation.prototype.removeSlashes = function(string) {
-      return string.replace(/[\s\\]+$/, '');
+      return string.replace(/[\s`\\]+$/, '');
     };
 
     Equation.prototype.changeBrackets = function(string, startPos, endPos, prefix, middle) {
@@ -381,7 +381,7 @@
       _ref = Equation.filters;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         f = _ref[_i];
-        regex = new RegExp("[\\s\\\\]*" + f, 'g');
+        regex = new RegExp("[\\s`\\\\]*" + f, 'g');
         value = value.replace(regex, f);
       }
       value = this.findAndReplace(value, Equation.symbolregex);

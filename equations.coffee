@@ -48,6 +48,7 @@ class Equation
     '\\$', '\\{', '\\}'
     'bo', 'it', 'bi', 'sc', 'fr', 'ov'
     'table', 'text', 'html'
+    ',', ':', ';'
   ]
 
   constructor: (@inputBox, @equationBox, @resizeText=false, @callback=null) ->
@@ -190,7 +191,7 @@ class Equation
 
     return string
 
-  removeSlashes: (string) -> string.replace(/[\s\\]+$/, '')
+  removeSlashes: (string) -> string.replace(/[\s`\\]+$/, '')
 
   changeBrackets: (string, startPos, endPos, prefix='', middle='') ->
     if not middle
@@ -253,7 +254,7 @@ class Equation
 
     # Remove macros and special characters
     for f in Equation.filters
-      regex = new RegExp("[\\s\\\\]*#{f}", 'g')
+      regex = new RegExp("[\\s`\\\\]*#{f}", 'g')
       value = value.replace(regex, f)
 
     # Display symbols, Greek letters and functions properly
