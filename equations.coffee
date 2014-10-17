@@ -27,23 +27,28 @@ class Equation
 
   @letter2regex: 'eta': 'η', 'psi': 'ψ', 'del': '∇'
 
-  @funcregex:
-    'exp': '\\exp', 'log': '\\log', 'lim': '\\lim'
-    'sqrt': '√', 'int': '∫', 'sum': '∑'
+  @opregex: 'lim': '\\lim', 'sqrt': '√', 'int': '∫', 'sum': '∑'
 
-  @trigfunctions: ['sin', 'cos', 'tan']
+  @specialops: ['^', '_', '/', '√', '∫', '∑']
 
-  @functions: Object.keys(Equation.funcregex).concat(Equation.trigfunctions)
+  @functions: ['exp', 'log', 'ln', 'sinc']
+
+  @trigfunctions: ['sin', 'cos', 'tan', 'csc', 'sec', 'cot']
+
+  do =>
+    for func in Equation.trigfunctions
+      @functions.push func
+      @functions.push "a#{func}"
+      @functions.push "#{func}h"
+      @functions.push "a#{func}h"
+
+  @funcops: Object.keys(Equation.opregex).concat(@functions)
 
   @filters: [
     '\\$', '\\{', '\\}'
     'bo', 'it', 'bi', 'sc', 'fr', 'ov'
     'table', 'text', 'html'
   ]
-
-  @trigregex: {}
-  do =>
-    @trigregex["(arc)?#{i}(h)?"] = "\\$1#{i}$2" for i in Equation.trigfunctions
 
   constructor: (@inputBox, @equationBox, @resizeText=false, @callback=null) ->
     @fontSize = parseFloat @equationBox.style.fontSize
@@ -136,17 +141,37 @@ class Equation
   parseFunction: (string, func) ->
     indexes = @findAllIndexes(string, func)
     for i in indexes.reverse()
+      # Workaround for asin, asinh, etc.
+      if string[i - 1] is 'a' and func[...3] in Equation.trigfunctions
+        continue
+
       startPos = i + func.length
+      if string[startPos] is '('
+        endPos = @findBracket(string, startPos)
+        # Wrap function
+        if endPos
+          string = "#{@removeSlashes string[...i]}{\\#{
+            @removeSlashes string[i..endPos]}}#{string[endPos + 1...]}"
+        else
+          string = "#{@removeSlashes string[...i]}{\\#{
+            @removeSlashes string[i...]}"
+
+    return string
+
+  parseOperator: (string, op) ->
+    indexes = @findAllIndexes(string, op)
+    for i in indexes.reverse()
+      startPos = i + op.length
       if string[startPos] is '('
         endPos = @findBracket(string, startPos)
         if endPos
           hasPower = string[endPos + 1] is '^'
           # Limit underscript adjustment
-          if func is 'lim'
+          if op is 'lim'
             string = @changeBrackets(string, startPos, endPos, '↙')
 
           # Functions with overscript and underscript
-          else if func is '∫' or func is '∑'
+          else if op in ['∫', '∑']
             args = string[startPos + 1...endPos]
             argsList = args.split ','
 
@@ -155,11 +180,13 @@ class Equation
               string = @changeBrackets(string, startPos, endPos,
                                      '↙', "#{@removeSlashes under}}↖{#{over}")
 
-          else if not (func is '/' and hasPower)
+          # Change parentheses except for binary operators raised to a power
+          else if not (op in ['/', '^'] and hasPower)
             string = @changeBrackets(string, startPos, endPos)
-            if func is '√' and hasPower
+            # Wrap square root if followed by a power
+            if op is '√' and hasPower
               string = "#{@removeSlashes string[...i]}{#{
-                @removeSlashes string[i...endPos]}}#{string[endPos...]}"
+                @removeSlashes string[i..endPos]}}#{string[endPos + 1...]}"
 
     return string
 
@@ -234,14 +261,17 @@ class Equation
     value = @findAndReplace(value, Equation.symbol2regex)
     value = @findAndReplace(value, Equation.letterregex)
     value = @findAndReplace(value, Equation.letter2regex)
-    value = @findAndReplace(value, Equation.funcregex)
-    value = @findAndReplace(value, Equation.trigregex)
+    value = @findAndReplace(value, Equation.opregex)
 
     # Allow d/dx without parentheses
     regex = new RegExp('/(d|∂)(x|y|z|t)', 'g')
     value = value.replace(regex, '/{$1$2}')
 
-    value = @parseFunction(value, 'lim')
+    # Parse functions
+    for func in Equation.functions
+      value = @parseFunction(value, func)
+
+    value = @parseOperator(value, 'lim')
 
     # Remove whitespace except after escaped tokens
     tokens = value.split /\s/
@@ -250,9 +280,9 @@ class Equation
     value = tokens.join ''
 
     if value
-      # Parse special functions/operations
-      for func in ['^', '_', '/', '√', '∫', '∑']
-        value = @parseFunction(value, func)
+      # Parse special operators
+      for op in Equation.specialops
+        value = @parseOperator(value, op)
 
       # Remove parentheses before division sign
       indexes = @findAllIndexes(value, '/')
@@ -371,12 +401,7 @@ class Equation
 
   needBracket: ->
     startPos = @inputBox.selectionStart
-    for f in Equation.trigfunctions
-      string = @inputBox.value[startPos - (f.length + 1)...startPos]
-      if string is "#{f}h"
-        return true
-
-    for f in Equation.functions
+    for f in Equation.funcops
       string = @inputBox.value[startPos - (f.length)...startPos]
       if string is f
         return true
