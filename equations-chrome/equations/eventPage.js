@@ -21,7 +21,7 @@
               file: "mathscribe/jqmath-etc-0.4.0.min.js"
             }, function() {
               return chrome.tabs.executeScript(tabId, {
-                file: "equations.js"
+                file: "equation.js"
               }, function() {
                 return chrome.tabs.executeScript(tabId, {
                   file: "webwork.js"

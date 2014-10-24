@@ -563,4 +563,4 @@
 
 }).call(this);
 
-//# sourceMappingURL=equations.js.map
+//# sourceMappingURL=equation.js.map
