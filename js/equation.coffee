@@ -27,9 +27,9 @@ class Equation
 
   @letter2regex: 'eta': 'η', 'psi': 'ψ', 'del': '∇'
 
-  @opregex: 'lim': '\\lim', 'sqrt': '√', 'int': '∫', 'sum': '∑'
+  @opregex: 'lim': '\\lim', 'sqrt': '√', 'int': '∫', 'sum': '∑', 'prod': '∏'
 
-  @specialops: ['^', '_', '/', '√', '∫', '∑']
+  @specialops: ['^', '_', '/', '√', '∫', '∑', '∏']
 
   @functions: ['exp', 'log', 'ln', 'sinc']
 
@@ -172,7 +172,7 @@ class Equation
             string = @changeBrackets(string, startPos, endPos, '↙')
 
           # Functions with overscript and underscript
-          else if op in ['∫', '∑']
+          else if op in ['∫', '∑', '∏']
             args = string[startPos + 1...endPos]
             argsList = args.split ','
 

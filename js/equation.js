@@ -98,10 +98,11 @@
       'lim': '\\lim',
       'sqrt': '√',
       'int': '∫',
-      'sum': '∑'
+      'sum': '∑',
+      'prod': '∏'
     };
 
-    Equation.specialops = ['^', '_', '/', '√', '∫', '∑'];
+    Equation.specialops = ['^', '_', '/', '√', '∫', '∑', '∏'];
 
     Equation.functions = ['exp', 'log', 'ln', 'sinc'];
 
@@ -285,7 +286,7 @@
             hasPower = string[endPos + 1] === '^';
             if (op === 'lim') {
               string = this.changeBrackets(string, startPos, endPos, '↙');
-            } else if (op === '∫' || op === '∑') {
+            } else if (op === '∫' || op === '∑' || op === '∏') {
               args = string.slice(startPos + 1, endPos);
               argsList = args.split(',');
               if (argsList.length === 2) {
