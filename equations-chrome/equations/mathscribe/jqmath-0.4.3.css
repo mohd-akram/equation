@@ -5,6 +5,8 @@
 fmath, .fm-math		{ font-family: STIXGeneral, 'DejaVu Serif', 'DejaVu Sans',
 						/* Cambria, 'Cambria Math', */ Times, 'Lucida Sans Unicode',
 						OpenSymbol, 'Standard Symbols L', serif; line-height: 1.2 }
+fmath mtext, .fm-math mtext
+					{ line-height: normal }
 fmath mo, .fm-mo, .ma-sans-serif, fmath mi[mathvariant*=sans-serif],
 fmath mn[mathvariant*=sans-serif], fmath mtext[mathvariant*=sans-serif],
 fmath ms[mathvariant*=sans-serif]

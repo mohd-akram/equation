@@ -14,8 +14,8 @@
     "persistent": false
   },
   "content_scripts": [ {
-      "js": [ "mathscribe/jquery-2.1.1.min.js", "mathscribe/jqmath-etc-0.4.0.min.js", "equation.js", "wolfram.js" ],
-      "css": [ "mathscribe/jqmath-0.4.0.css", "wolfram.css" ],
+      "js": [ "mathscribe/jquery-2.1.4.min.js", "mathscribe/jqmath-etc-0.4.3.min.js", "equation.js", "wolfram.js" ],
+      "css": [ "mathscribe/jqmath-0.4.3.css", "wolfram.css" ],
       "matches": [ "http://www.wolframalpha.com/input/*", "https://www.wolframalpha.com/input/*" ]
    } ],
   "permissions": [

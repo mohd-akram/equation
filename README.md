@@ -9,4 +9,4 @@ Download the repository and open index.html.
 
 **Libraries used**
 
-jqMath 0.4.0 (depends on jQuery)
+jqMath 0.4.3 (depends on jQuery)

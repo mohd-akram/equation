@@ -8,12 +8,12 @@ loadEquations = (tabId, tab) ->
       code: getInputBoxes, (result) ->
         if result[0] > 0
           chrome.tabs.insertCSS tabId,
-            file: "mathscribe/jqmath-0.4.0.css"
+            file: "mathscribe/jqmath-0.4.3.css"
 
           chrome.tabs.executeScript tabId,
-            file: "mathscribe/jquery-2.1.1.min.js", ->
+            file: "mathscribe/jquery-2.1.4.min.js", ->
               chrome.tabs.executeScript tabId,
-                file: "mathscribe/jqmath-etc-0.4.0.min.js", ->
+                file: "mathscribe/jqmath-etc-0.4.3.min.js", ->
                   chrome.tabs.executeScript tabId,
                     file: "equation.js", ->
                       chrome.tabs.executeScript tabId,
