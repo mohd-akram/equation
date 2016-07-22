@@ -11,9 +11,9 @@ loadEquations = (tabId, tab) ->
             file: "mathscribe/jqmath-0.4.3.css"
 
           chrome.tabs.executeScript tabId,
-            file: "mathscribe/jquery-2.1.4.min.js", ->
+            file: "mathscribe/jquery-3.1.0.min.js", ->
               chrome.tabs.executeScript tabId,
-                file: "mathscribe/jqmath-etc-0.4.3.min.js", ->
+                file: "mathscribe/jqmath-etc-0.4.4.min.js", ->
                   chrome.tabs.executeScript tabId,
                     file: "equation.js", ->
                       chrome.tabs.executeScript tabId,

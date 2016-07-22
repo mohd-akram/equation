@@ -1,8 +1,4 @@
-#equationBox-icon {
-  margin-left: 5px;
-}
-
-#equationBox-wolfram {
+#equationBox {
   text-align: center;
   overflow: auto;
   color: #FE6518;

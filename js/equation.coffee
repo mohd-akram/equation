@@ -21,7 +21,7 @@ class Equation
     'Kappa': 'Κ', 'kappa': 'κ', 'Lambda': 'Λ', 'lambda': 'λ'
     'Mu': 'Μ', 'mu': 'μ', 'Nu': 'Ν', 'nu': 'ν', 'Xi': 'Ξ', 'xi': 'ξ'
     'Omicron': 'Ο', 'omicron': 'ο', 'Pi': 'Π', 'pi': 'π'
-    'Rho': 'Ρ', 'rho': 'ρ', 'Sigma': '∑', 'sigma': 'σ', 'Tau': 'Τ', 'tau': 'τ'
+    'Rho': 'Ρ', 'rho': 'ρ', 'Sigma': 'Σ', 'sigma': 'σ', 'Tau': 'Τ', 'tau': 'τ'
     'Upsilon': 'Υ', 'upsilon': 'υ', 'Phi': 'Φ', 'phi': 'φ'
     'Chi': 'Χ', 'chi': 'χ', 'Psi': 'Ψ', 'Omega': 'Ω', 'omega': 'ω', 'inf': '∞'
 

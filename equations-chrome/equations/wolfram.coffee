@@ -1,28 +1,22 @@
-inputBox = document.getElementById 'i'
-
-div = document.createElement 'div'
-div.id = 'equationBox-icon'
+button = document.createElement 'button'
 imgURL = chrome.extension.getURL 'icon.png'
 
-div.innerHTML = "<a id=\"equationsEnabled\">
-<img src=\"#{imgURL}\" alt=\"Quick Equations\"></a>"
+button.innerHTML = "<img src=\"#{imgURL}\" alt=\"Quick Equations\">"
 
-optionsDiv = document.getElementById 'moreInput'
-optionsDiv.appendChild div
-
-wolframBox = document.getElementById 'results'
-equationsIcon = document.getElementById 'equationsEnabled'
+optionsDiv = document.getElementsByClassName('input-bottom-buttons')[0]
+optionsDiv.appendChild button
 
 equation = null
 
-equationsIcon.onclick = ->
-  equationBox = document.getElementById 'equationBox-wolfram'
+button.onclick = (e) ->
+  equationBox = window.equationBox
   if not equationBox
     equationBox = document.createElement 'div'
-    equationBox.id = 'equationBox-wolfram'
+    equationBox.id = 'equationBox'
     equationBox.innerHTML = 'Type an equation above'
-    wolframBox.insertBefore equationBox, wolframBox.firstChild
-    equation = new Equation(inputBox, equationBox)
+    view.parentNode.insertBefore equationBox, view
+    equation = new Equation(query, equationBox)
   else
     equation.disable()
-    wolframBox.removeChild equationBox
+    view.parentNode.removeChild equationBox
+  e.preventDefault()
