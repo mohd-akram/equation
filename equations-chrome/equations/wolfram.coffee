@@ -3,8 +3,10 @@ imgURL = chrome.extension.getURL 'icon.png'
 
 button.innerHTML = "<img src=\"#{imgURL}\" alt=\"Quick Equations\">"
 
-optionsDiv = document.getElementsByClassName('input-bottom-buttons')[0]
-optionsDiv.appendChild button
+setTimeout ->
+  optionsDiv = document.getElementsByClassName('input-bottom-buttons')[0]
+  optionsDiv.appendChild button
+, 0
 
 equation = null
 

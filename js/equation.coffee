@@ -229,6 +229,8 @@ class Equation
       field.value += value
       field.focus()
 
+    field.dispatchEvent new Event('input')
+
     @updateMath()
 
   updateBox: ->

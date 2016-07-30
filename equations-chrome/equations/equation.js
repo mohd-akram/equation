@@ -351,6 +351,7 @@
         field.value += value;
         field.focus();
       }
+      field.dispatchEvent(new Event('input'));
       return this.updateMath();
     };
 
