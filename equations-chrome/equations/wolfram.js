@@ -23,11 +23,11 @@
       equationBox = document.createElement('div');
       equationBox.id = 'equationBox';
       equationBox.innerHTML = 'Type an equation above';
-      view.parentNode.insertBefore(equationBox, view);
+      view.insertBefore(equationBox, view.firstChild);
       equation = new Equation(query, equationBox);
     } else {
       equation.disable();
-      view.parentNode.removeChild(equationBox);
+      view.removeChild(equationBox);
     }
     return e.preventDefault();
   };
