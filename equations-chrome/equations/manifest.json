@@ -10,21 +10,42 @@
   },
   "options_page": "options.html",
   "background": {
-    "scripts": [ "eventPage.js" ],
+    "scripts": [
+      "eventPage.js"
+    ],
     "persistent": false
   },
   "content_scripts": [
-	{
-      "js": [ "mathscribe/jquery-3.1.0.min.js", "mathscribe/jqmath-etc-0.4.4.min.js", "equation.js", "wolfram.js" ],
-      "css": [ "mathscribe/jqmath-0.4.3.css", "wolfram.css" ],
-      "matches": [ "http://www.wolframalpha.com/input/*", "https://www.wolframalpha.com/input/*" ]
-	}
+    {
+      "js": [
+        "mathscribe/jquery-3.3.1.min.js",
+        "mathscribe/jqmath-etc-0.4.6.min.js",
+        "equation.js",
+        "wolfram.js"
+      ],
+      "css": [
+        "mathscribe/jqmath-0.4.3.css",
+        "wolfram.css"
+      ],
+      "matches": [
+        "http://www.wolframalpha.com/input/*",
+        "https://www.wolframalpha.com/input/*"
+      ]
+    }
   ],
-  "permissions": [ "storage" ],
-  "optional_permissions": [ "tabs", "http://*/*", "https://*/*" ],
+  "permissions": [
+    "storage"
+  ],
+  "optional_permissions": [
+    "tabs",
+    "http://*/*",
+    "https://*/*"
+  ],
   "icons": {
     "48": "icon48.png",
     "128": "icon128.png"
   },
-  "web_accessible_resources": [ "icon.png" ]
+  "web_accessible_resources": [
+    "icon.png"
+  ]
 }

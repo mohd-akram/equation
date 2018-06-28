@@ -1,0 +1,29 @@
+{
+  "name": "equation",
+  "version": "1.0.0",
+  "description": "Equation editor",
+  "main": "js/equation.js",
+  "scripts": {
+    "build": "coffee -cm js/equation.coffee && npm run build-chrome",
+    "build-chrome": "cp js/equation.js equations-chrome/equations && coffee -cm equations-chrome/equations",
+    "watch": "coffee -cmw js/equation.coffee",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mohd-akram/equation.git"
+  },
+  "keywords": [
+    "equation",
+    "editor"
+  ],
+  "author": "Mohamed Akram",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mohd-akram/equation/issues"
+  },
+  "homepage": "https://github.com/mohd-akram/equation#readme",
+  "devDependencies": {
+    "coffeescript": "^2.3.1"
+  }
+}

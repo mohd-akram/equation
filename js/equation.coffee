@@ -35,14 +35,15 @@ class Equation
 
   @trigfunctions: ['sin', 'cos', 'tan', 'csc', 'sec', 'cot']
 
-  do =>
-    for func in Equation.trigfunctions
+  do (->
+    for func in @trigfunctions
       @functions.push func
       @functions.push "a#{func}"
       @functions.push "#{func}h"
       @functions.push "a#{func}h"
+  ).bind @
 
-  @funcops: Object.keys(Equation.opregex).concat(@functions)
+  @funcops: Object.keys(@opregex).concat(@functions)
 
   @filters: [
     '\\$', '\\{', '\\}'
