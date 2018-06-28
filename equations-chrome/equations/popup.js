@@ -17,7 +17,7 @@
       return inputBox.onsearch = function() {
         var url;
         if (inputBox.value) {
-          url = `http://www.wolframalpha.com/input/?i=${encodeURIComponent(inputBox.value)}`;
+          url = `https://www.wolframalpha.com/input/?i=${encodeURIComponent(inputBox.value)}`;
           return chrome.tabs.create({
             url: url
           });
