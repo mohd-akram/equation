@@ -8,20 +8,20 @@ loadEquations = (tabId, tab) ->
       code: getInputBoxes, (result) ->
         if result[0] > 0
           chrome.tabs.insertCSS tabId,
-            file: "mathscribe/jqmath-0.4.3.css"
+            file: 'mathscribe/jqmath-0.4.3.css'
 
           chrome.tabs.executeScript tabId,
-            file: "mathscribe/jquery-3.3.1.min.js", ->
+            file: 'mathscribe/jquery-3.3.1.min.js', ->
               chrome.tabs.executeScript tabId,
-                file: "mathscribe/jqmath-etc-0.4.6.min.js", ->
+                file: 'mathscribe/jqmath-etc-0.4.6.min.js', ->
                   chrome.tabs.executeScript tabId,
-                    file: "equation.js", ->
+                    file: 'equation.js', ->
                       chrome.tabs.executeScript tabId,
-                        file: "webwork.js"
+                        file: 'webwork.js'
 
 chrome.tabs.onUpdated.addListener (tabId, changeInfo, tab) ->
   if changeInfo.status is 'complete'
     chrome.permissions.contains
       permissions: ['tabs']
-      origins: ["http://*/*", "https://*/*"],
+      origins: ['http://*/*', 'https://*/*'],
       (permitted) -> loadEquations(tabId, tab) if permitted

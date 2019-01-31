@@ -12,19 +12,19 @@
       }, function(result) {
         if (result[0] > 0) {
           chrome.tabs.insertCSS(tabId, {
-            file: "mathscribe/jqmath-0.4.3.css"
+            file: 'mathscribe/jqmath-0.4.3.css'
           });
           return chrome.tabs.executeScript(tabId, {
-            file: "mathscribe/jquery-3.3.1.min.js"
+            file: 'mathscribe/jquery-3.3.1.min.js'
           }, function() {
             return chrome.tabs.executeScript(tabId, {
-              file: "mathscribe/jqmath-etc-0.4.6.min.js"
+              file: 'mathscribe/jqmath-etc-0.4.6.min.js'
             }, function() {
               return chrome.tabs.executeScript(tabId, {
-                file: "equation.js"
+                file: 'equation.js'
               }, function() {
                 return chrome.tabs.executeScript(tabId, {
-                  file: "webwork.js"
+                  file: 'webwork.js'
                 });
               });
             });
@@ -38,7 +38,7 @@
     if (changeInfo.status === 'complete') {
       return chrome.permissions.contains({
         permissions: ['tabs'],
-        origins: ["http://*/*", "https://*/*"]
+        origins: ['http://*/*', 'https://*/*']
       }, function(permitted) {
         if (permitted) {
           return loadEquations(tabId, tab);

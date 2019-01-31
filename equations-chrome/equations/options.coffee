@@ -1,8 +1,8 @@
 window.onload = ->
   enableWebwork = document.getElementById 'enable-webwork'
   permissions =
-    permissions: ["tabs"]
-    origins: ["http://*/*", "https://*/*"]
+    permissions: ['tabs']
+    origins: ['http://*/*', 'https://*/*']
 
   chrome.permissions.contains permissions, (result) ->
     if result

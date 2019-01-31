@@ -4,8 +4,8 @@
     var enableWebwork, permissions;
     enableWebwork = document.getElementById('enable-webwork');
     permissions = {
-      permissions: ["tabs"],
-      origins: ["http://*/*", "https://*/*"]
+      permissions: ['tabs'],
+      origins: ['http://*/*', 'https://*/*']
     };
     chrome.permissions.contains(permissions, function(result) {
       if (result) {
