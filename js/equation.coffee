@@ -1,5 +1,46 @@
 root = exports ? this
 
+class ElementImage
+  constructor: (@element) ->
+    @elementDisplay = @element.style.display
+    @image = document.createElement 'img'
+    style = window.getComputedStyle @element
+    @imageDisplay = style.display
+    @image.style.verticalAlign = style.verticalAlign
+    @image.style.display = 'none'
+    @element.parentNode.insertBefore @image, @element
+    @observer = new MutationObserver @update
+    @observer.observe @element, childList: true, subtree: true
+    @element.addEventListener 'mousedown', @show
+
+  remove: ->
+    @observer.disconnect()
+    @hide()
+    @image.remove()
+
+  update: =>
+    clearTimeout @timeout if @timeout
+    @timeout = setTimeout =>
+      @timeout = null
+      @hide()
+      domtoimage.toPng(@element)
+        .then (url) =>
+          @image.width = @element.clientWidth
+          @image.style.height = "#{@element.clientHeight}px"
+          @image.style.objectFit = 'cover'
+          @image.style.objectPosition = 'center 0'
+          @image.src = url
+        .catch (err) -> console.error err
+    , if @timeout then 10 else 0
+
+  show: =>
+    @image.style.display = @imageDisplay
+    @element.style.display = 'none'
+
+  hide: =>
+    @image.style.display = 'none'
+    @element.style.display = @elementDisplay
+
 class Equation
   @shortcuts:
     '[': '(', ']': ')', "'": '*', ';': '+', '`': "'", 'up': '^(', 'down': '_'
@@ -53,6 +94,16 @@ class Equation
   ]
 
   constructor: (@inputBox, @equationBox, @resizeText=false, @callback=null) ->
+    parent = @equationBox
+
+    @equationBox = document.createElement 'div'
+    @equationBox.style.display = 'inline-block'
+    @equationBox.style.padding = '0 0.2em'
+    @equationBox.style.verticalAlign = 'top'
+    @equationBox.innerHTML = parent.innerHTML
+    parent.innerHTML = ''
+    parent.appendChild @equationBox
+
     @fontSize = parseFloat @equationBox.style.fontSize
     @message = @equationBox.innerHTML
 
@@ -394,11 +445,13 @@ class Equation
     @inputBox.removeEventListener('keyup', @keyUpHandler, false)
 
   enable: ->
+    @equationImage = new ElementImage @equationBox if window.domtoimage
     @enableShortcuts()
     @inputBox.addEventListener('search', @searchHandler, false)
     @updateMath()
 
   disable: ->
+    @equationImage.remove() if @equationImage
     @disableShortcuts()
     @inputBox.removeEventListener('search', @searchHandler, false)
     @equationBox.innerHTML = @message

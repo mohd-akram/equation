@@ -7,6 +7,7 @@
     "build": "coffee -cm js/equation.coffee && npm run build-chrome",
     "build-chrome": "cp js/equation.js equations-chrome/equations && coffee -cm equations-chrome/equations",
     "watch": "coffee -cmw js/equation.coffee",
+    "watch-chrome": "coffee -cmw equations-chrome/equations",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

@@ -6,11 +6,16 @@ window.onload = ->
     if items.equation
       inputBox.value = items.equation
 
-    equation = new Equation(inputBox, equationBox, false, ->
-      chrome.storage.sync.set(equation: inputBox.value))
+    timeout = null
+    equation = new Equation inputBox, equationBox, false, ->
+      clearTimeout timeout if timeout
+      timeout = setTimeout ->
+        timeout = null
+        chrome.storage.sync.set equation: inputBox.value
+      , if timeout then 10 else 0
 
     inputBox.onsearch = ->
       if inputBox.value
         url = "https://www.wolframalpha.com/input/?i=#{
               encodeURIComponent inputBox.value}"
-        chrome.tabs.create(url: url)
+        chrome.tabs.create url: url

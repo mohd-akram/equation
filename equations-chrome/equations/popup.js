@@ -5,14 +5,21 @@
     inputBox = document.getElementById('inputBox');
     equationBox = document.getElementById('equationBox');
     return chrome.storage.sync.get('equation', function(items) {
-      var equation;
+      var equation, timeout;
       if (items.equation) {
         inputBox.value = items.equation;
       }
+      timeout = null;
       equation = new Equation(inputBox, equationBox, false, function() {
-        return chrome.storage.sync.set({
-          equation: inputBox.value
-        });
+        if (timeout) {
+          clearTimeout(timeout);
+        }
+        return timeout = setTimeout(function() {
+          timeout = null;
+          return chrome.storage.sync.set({
+            equation: inputBox.value
+          });
+        }, timeout ? 10 : 0);
       });
       return inputBox.onsearch = function() {
         var url;
