@@ -1,7 +1,7 @@
 {
   "name": "Quick Equations",
   "short_name": "Quick Eqs",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "manifest_version": 2,
   "description": "A fast, shortcut based equation editor with realtime preview and WolframAlpha, WeBWorK and Google Forms support.",
   "browser_action": {
