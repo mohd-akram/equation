@@ -38,6 +38,9 @@
   ],
   "optional_permissions": [
     "tabs",
+    "webNavigation",
+    "http://docs.google.com/*",
+    "https://docs.google.com/*",
     "http://*/*",
     "https://*/*"
   ],
