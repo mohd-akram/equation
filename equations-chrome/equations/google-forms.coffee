@@ -65,11 +65,11 @@ enableInputBox inputBox for inputBox in inputBoxes
 
 observer = new MutationObserver (mutations) ->
   for mutation in mutations
-    inputBox = mutation.target.querySelector? "
+    inputBoxes = mutation.target.querySelectorAll "
       .freebirdFormviewerViewItemsTextShortText,
       .#{responseClassName}
     "
-    if inputBox
+    for inputBox in inputBoxes
       inputBox.style.display = 'inline-block'
       enableInputBox inputBox
 

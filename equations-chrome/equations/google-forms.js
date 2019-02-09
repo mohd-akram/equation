@@ -71,17 +71,21 @@
   }
 
   observer = new MutationObserver(function(mutations) {
-    var base, j, len1, mutation, results;
+    var j, len1, mutation, results;
     results = [];
     for (j = 0, len1 = mutations.length; j < len1; j++) {
       mutation = mutations[j];
-      inputBox = typeof (base = mutation.target).querySelector === "function" ? base.querySelector(`.freebirdFormviewerViewItemsTextShortText, .${responseClassName}`) : void 0;
-      if (inputBox) {
-        inputBox.style.display = 'inline-block';
-        results.push(enableInputBox(inputBox));
-      } else {
-        results.push(void 0);
-      }
+      inputBoxes = mutation.target.querySelectorAll(`.freebirdFormviewerViewItemsTextShortText, .${responseClassName}`);
+      results.push((function() {
+        var k, len2, results1;
+        results1 = [];
+        for (k = 0, len2 = inputBoxes.length; k < len2; k++) {
+          inputBox = inputBoxes[k];
+          inputBox.style.display = 'inline-block';
+          results1.push(enableInputBox(inputBox));
+        }
+        return results1;
+      })());
     }
     return results;
   });
