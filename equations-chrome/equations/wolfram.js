@@ -9,11 +9,11 @@
   button.innerHTML = `<img src="${imgURL}" alt="Quick Equations">`;
 
   observer = new MutationObserver(function(mutations) {
-    var base, i, len, mutation, optionsDiv;
+    var i, len, mutation, optionsDiv;
     optionsDiv = null;
     for (i = 0, len = mutations.length; i < len; i++) {
       mutation = mutations[i];
-      optionsDiv = typeof (base = mutation.target).querySelector === "function" ? base.querySelector('.input-bottom-buttons') : void 0;
+      optionsDiv = mutation.target.querySelector('.input-bottom-buttons');
       if (optionsDiv) {
         break;
       }

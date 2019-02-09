@@ -107,5 +107,4 @@ if picker
       dt = createDataTransfer url, 'equation.png'
       input = picker.querySelector 'input[type=file]'
       input.files = dt.files
-      input.dispatchEvent new Event 'change'
     img.src = url

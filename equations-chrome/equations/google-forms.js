@@ -131,8 +131,7 @@
         url = imageToDataURL(img, img.width / 2, img.height / 2);
         dt = createDataTransfer(url, 'equation.png');
         input = picker.querySelector('input[type=file]');
-        input.files = dt.files;
-        return input.dispatchEvent(new Event('change'));
+        return input.files = dt.files;
       };
       return img.src = url;
     });

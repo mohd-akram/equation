@@ -6,7 +6,7 @@ button.innerHTML = "<img src=\"#{imgURL}\" alt=\"Quick Equations\">"
 observer = new MutationObserver (mutations) ->
   optionsDiv = null
   for mutation in mutations
-    optionsDiv = mutation.target.querySelector? '.input-bottom-buttons'
+    optionsDiv = mutation.target.querySelector '.input-bottom-buttons'
     break if optionsDiv
   if optionsDiv
     optionsDiv.appendChild button
