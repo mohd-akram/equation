@@ -42,9 +42,7 @@
         this.hide();
         return domtoimage.toPng(this.element).then((url) => {
           this.image.width = this.element.clientWidth;
-          this.image.style.height = `${this.element.clientHeight}px`;
-          this.image.style.objectFit = 'cover';
-          this.image.style.objectPosition = 'center 0';
+          this.image.height = this.element.clientHeight;
           return this.image.src = url;
         }).catch(function(err) {
           return console.error(err);
@@ -79,6 +77,7 @@
         parent = this.equationBox;
         this.equationBox = document.createElement('div');
         this.equationBox.style.display = 'inline-block';
+        // Needed to avoid cut-off due to italics
         this.equationBox.style.padding = '0 0.2em';
         this.equationBox.style.verticalAlign = 'top';
         this.equationBox.innerHTML = parent.innerHTML;

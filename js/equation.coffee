@@ -26,9 +26,7 @@ class ElementImage
       domtoimage.toPng(@element)
         .then (url) =>
           @image.width = @element.clientWidth
-          @image.style.height = "#{@element.clientHeight}px"
-          @image.style.objectFit = 'cover'
-          @image.style.objectPosition = 'center 0'
+          @image.height = @element.clientHeight
           @image.src = url
         .catch (err) -> console.error err
     , if @timeout then 10 else 0
@@ -98,6 +96,7 @@ class Equation
 
     @equationBox = document.createElement 'div'
     @equationBox.style.display = 'inline-block'
+    # Needed to avoid cut-off due to italics
     @equationBox.style.padding = '0 0.2em'
     @equationBox.style.verticalAlign = 'top'
     @equationBox.innerHTML = parent.innerHTML
