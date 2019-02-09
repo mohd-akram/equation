@@ -3,10 +3,15 @@ imgURL = chrome.extension.getURL 'icon.png'
 
 button.innerHTML = "<img src=\"#{imgURL}\" alt=\"Quick Equations\">"
 
-setTimeout ->
-  optionsDiv = document.getElementsByClassName('input-bottom-buttons')[0]
-  optionsDiv.appendChild button
-, 0
+observer = new MutationObserver (mutations) ->
+  optionsDiv = null
+  for mutation in mutations
+    optionsDiv = mutation.target.querySelector? '.input-bottom-buttons'
+    break if optionsDiv
+  if optionsDiv
+    optionsDiv.appendChild button
+    observer.disconnect()
+observer.observe document.body, childList: true
 
 equation = null
 
