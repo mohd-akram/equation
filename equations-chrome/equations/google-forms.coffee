@@ -9,6 +9,31 @@ shortResponseClassName =
 longResponseClassName =
   'freebirdFormeditorViewResponsesQuestionviewItemsLongText'
 
+removeOldEquations = (equations) ->
+  month = 30 * 24 * 60 * 60 * 1000
+  now = Date.now()
+  for equation of equations
+    delete equations[equation] if now - equations[equation] > month
+
+rememberEquation = (equation) ->
+  chrome.storage.sync.get 'knownEquations', (items) ->
+    knownEquations = items.knownEquations || {}
+    removeOldEquations knownEquations
+    knownEquations[equation] = Date.now()
+    chrome.storage.sync.set knownEquations: knownEquations
+
+forgetEquation = (equation) ->
+  chrome.storage.sync.get 'knownEquations', (items) ->
+    knownEquations = items.knownEquations || {}
+    removeOldEquations knownEquations
+    delete knownEquations[equation]
+    chrome.storage.sync.set knownEquations: knownEquations
+
+knownEquation = (equation, callback) ->
+  chrome.storage.sync.get 'knownEquations', (items) ->
+    knownEquations = items.knownEquations || {}
+    callback equation of knownEquations
+
 enableInputBox = (element) ->
   return unless element
   wrapper = element.closest '
@@ -39,19 +64,16 @@ enableInputBox = (element) ->
 
   button.appendChild image
 
-  equation = null
-  equationBox = null
-
   # Avoid highlighting input element on click
   button.onmousedown = (e) -> e.preventDefault()
 
-  button.onclick = ->
-    if equation
-      equation.disable()
-      equation = null
-      equationBox.remove()
-      equationBox = null
-      return
+  elementValue = -> element.value || element.innerHTML
+
+  equation = null
+  equationBox = null
+
+  show = ->
+    rememberEquation elementValue()
     equationBox = document.createElement 'div'
     equationBox.style.display = 'inline-block'
     equationBox.style.marginTop = '5px'
@@ -65,12 +87,24 @@ enableInputBox = (element) ->
     wrapper.parentNode.insertBefore equationBox, wrapper
     if element.tagName in ['INPUT', 'TEXTAREA']
       inputBox = element
-      inputBox.focus()
     else
-      value = element.innerHTML
       inputBox = document.createElement 'textarea'
-      inputBox.value = value
+      inputBox.value = elementValue()
     equation = new Equation inputBox, equationBox
+
+  hide = ->
+    equation.disable()
+    equation = null
+    equationBox.remove()
+    equationBox = null
+    forgetEquation elementValue()
+
+  button.onclick = ->
+    return hide() if equation
+    show()
+    element.focus() if element.tagName in ['INPUT', 'TEXTAREA']
+
+  knownEquation elementValue(), (known) -> show() if known
 
   element.parentNode.insertBefore button, element.nextSibling
 
