@@ -1,4 +1,6 @@
 button = document.createElement 'button'
+button.type = 'button'
+
 imgURL = chrome.extension.getURL 'icon.png'
 
 button.innerHTML = "<img src=\"#{imgURL}\" alt=\"Quick Equations\">"

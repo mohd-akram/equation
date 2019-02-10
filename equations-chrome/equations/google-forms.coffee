@@ -29,6 +29,7 @@ enableInputBox = (element) ->
   image.style.display = 'block'
 
   button = document.createElement 'button'
+  button.type = 'button'
   button.style.background = 'none'
   button.style.border = 'none'
   button.style.cursor = 'pointer'
