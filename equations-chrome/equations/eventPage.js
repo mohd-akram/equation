@@ -27,7 +27,7 @@
     if (isGoogleForms(tab.url) && !chrome.webNavigation) {
       return;
     }
-    selector = isGoogleForms(tab.url) ? 'input.quantumWizTextinputPaperinputInput' : 'input[id*=AnSwEr]';
+    selector = isGoogleForms(tab.url) ? 'input.quantumWizTextinputPaperinputInput, textarea.quantumWizTextinputPapertextareaInput' : 'input[id*=AnSwEr]';
     getInputBoxes = `inputBoxes = document.querySelectorAll('${selector}');\ninputBoxes.length`;
     return chrome.tabs.executeScript(tab.id, {
       code: getInputBoxes
@@ -38,6 +38,10 @@
       if (result[0] > 0) {
         chrome.tabs.insertCSS(tab.id, {
           file: 'vendor/jqmath-0.4.3.css'
+        }, function() {
+          return chrome.tabs.insertCSS(tab.id, {
+            code: 'fmath.ma-block { text-align: left }'
+          });
         });
         return chrome.tabs.executeScript(tab.id, {
           file: 'vendor/jquery-3.3.1.min.js'

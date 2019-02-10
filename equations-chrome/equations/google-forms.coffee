@@ -4,12 +4,16 @@ className = 'qe-input-box'
 
 inputBoxes = window.inputBoxes || []
 
-responseClassName = 'freebirdFormeditorViewResponsesQuestionviewItemsShortText'
+shortResponseClassName =
+  'freebirdFormeditorViewResponsesQuestionviewItemsShortText'
+longResponseClassName =
+  'freebirdFormeditorViewResponsesQuestionviewItemsLongText'
 
 enableInputBox = (element) ->
   return unless element
   wrapper = element.closest '
     .freebirdFormviewerViewItemsTextItemWrapper,
+    .freebirdFormviewerViewItemsTextLongText,
     .freebirdFormeditorViewResponsesQuestionviewQuestionAnswerPreview
   '
   return unless wrapper
@@ -47,15 +51,18 @@ enableInputBox = (element) ->
     equationBox.style.display = 'inline-block'
     equationBox.style.marginTop = '5px'
     equationBox.style.fontSize = '1.5em'
-    if element.classList.contains responseClassName
+    isResponse =
+      element.classList.contains(shortResponseClassName) or
+      element.classList.contains(longResponseClassName)
+    if isResponse
       equationBox.style.paddingTop = '20px'
       equationBox.style.paddingLeft = '36px'
     wrapper.parentNode.insertBefore equationBox, wrapper
-    if element.tagName is 'INPUT'
+    if element.tagName in ['INPUT', 'TEXTAREA']
       inputBox = element
     else
-      value = element.innerText
-      inputBox = document.createElement 'input'
+      value = element.innerHTML
+      inputBox = document.createElement 'textarea'
       inputBox.value = value
     equation = new Equation inputBox, equationBox
 
@@ -67,7 +74,9 @@ observer = new MutationObserver (mutations) ->
   for mutation in mutations
     inputBoxes = mutation.target.querySelectorAll "
       .freebirdFormviewerViewItemsTextShortText,
-      .#{responseClassName}
+      .freebirdFormviewerViewItemsTextLongText,
+      .#{shortResponseClassName},
+      .#{longResponseClassName}
     "
     for inputBox in inputBoxes
       inputBox.style.display = 'inline-block'

@@ -13,8 +13,10 @@ loadEquations = (tab) ->
   return if isGoogleForms(tab.url) and not chrome.webNavigation
 
   selector =
-    if isGoogleForms tab.url then 'input.quantumWizTextinputPaperinputInput'
-    else 'input[id*=AnSwEr]'
+    if isGoogleForms tab.url then '
+      input.quantumWizTextinputPaperinputInput,
+      textarea.quantumWizTextinputPapertextareaInput
+    ' else 'input[id*=AnSwEr]'
 
   getInputBoxes =
     """
@@ -28,7 +30,9 @@ loadEquations = (tab) ->
 
       if result[0] > 0
         chrome.tabs.insertCSS tab.id,
-          file: 'vendor/jqmath-0.4.3.css'
+          file: 'vendor/jqmath-0.4.3.css', ->
+            chrome.tabs.insertCSS tab.id,
+              code: 'fmath.ma-block { text-align: left }'
 
         chrome.tabs.executeScript tab.id,
           file: 'vendor/jquery-3.3.1.min.js', ->

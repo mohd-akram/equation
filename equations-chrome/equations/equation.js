@@ -350,6 +350,10 @@
           value = this.parseFunction(value, func);
         }
         value = this.parseOperator(value, 'lim');
+        // Preserve newlines
+        M.MathPlayer = false;
+        M.trustHtml = true;
+        value = value.replace(/\n/g, "\\html'<br>'");
         // Remove whitespace except after escaped tokens
         tokens = value.split(/\s/);
         for (i = m = 0, len2 = tokens.length; m < len2; i = ++m) {

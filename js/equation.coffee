@@ -327,6 +327,11 @@ class Equation
 
     value = @parseOperator(value, 'lim')
 
+    # Preserve newlines
+    M.MathPlayer = false
+    M.trustHtml = true
+    value = value.replace /\n/g, "\\html'<br>'"
+
     # Remove whitespace except after escaped tokens
     tokens = value.split /\s/
     for token, i in tokens
