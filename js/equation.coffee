@@ -11,7 +11,7 @@ class ElementImage
     @element.parentNode.insertBefore @image, @element
     @observer = new MutationObserver @update
     @observer.observe @element, childList: true, subtree: true
-    @element.addEventListener 'mousedown', @show
+    @element.addEventListener 'mousedown', => @show() if @image.src
 
   remove: ->
     @observer.disconnect()
@@ -30,7 +30,6 @@ class ElementImage
           @image.style.objectFit = 'cover'
           @image.style.objectPosition = 'center 0'
           @image.src = url
-        .catch (err) -> console.error err
     , if @timeout then 10 else 0
 
   show: =>

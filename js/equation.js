@@ -24,7 +24,11 @@
         childList: true,
         subtree: true
       });
-      this.element.addEventListener('mousedown', this.show);
+      this.element.addEventListener('mousedown', () => {
+        if (this.image.src) {
+          return this.show();
+        }
+      });
     }
 
     remove() {
@@ -46,8 +50,6 @@
           this.image.style.objectFit = 'cover';
           this.image.style.objectPosition = 'center 0';
           return this.image.src = url;
-        }).catch(function(err) {
-          return console.error(err);
         });
       }, this.timeout ? 10 : 0);
     }
