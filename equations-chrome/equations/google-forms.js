@@ -30,6 +30,7 @@
     image.style.display = 'block';
     button = document.createElement('button');
     button.type = 'button';
+    button.tabIndex = -1;
     button.style.background = 'none';
     button.style.border = 'none';
     button.style.cursor = 'pointer';
@@ -38,6 +39,10 @@
     button.appendChild(image);
     equation = null;
     equationBox = null;
+    // Avoid highlighting input element on click
+    button.onmousedown = function(e) {
+      return e.preventDefault();
+    };
     button.onclick = function() {
       var inputBox, isResponse, ref, value;
       if (equation) {
@@ -59,6 +64,7 @@
       wrapper.parentNode.insertBefore(equationBox, wrapper);
       if ((ref = element.tagName) === 'INPUT' || ref === 'TEXTAREA') {
         inputBox = element;
+        inputBox.focus();
       } else {
         value = element.innerHTML;
         inputBox = document.createElement('textarea');

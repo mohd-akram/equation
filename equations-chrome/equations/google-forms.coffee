@@ -30,6 +30,7 @@ enableInputBox = (element) ->
 
   button = document.createElement 'button'
   button.type = 'button'
+  button.tabIndex = -1
   button.style.background = 'none'
   button.style.border = 'none'
   button.style.cursor = 'pointer'
@@ -40,6 +41,9 @@ enableInputBox = (element) ->
 
   equation = null
   equationBox = null
+
+  # Avoid highlighting input element on click
+  button.onmousedown = (e) -> e.preventDefault()
 
   button.onclick = ->
     if equation
@@ -61,6 +65,7 @@ enableInputBox = (element) ->
     wrapper.parentNode.insertBefore equationBox, wrapper
     if element.tagName in ['INPUT', 'TEXTAREA']
       inputBox = element
+      inputBox.focus()
     else
       value = element.innerHTML
       inputBox = document.createElement 'textarea'
