@@ -27,6 +27,8 @@ class ElementImage
         .then (url) =>
           @image.width = @element.clientWidth
           @image.height = @element.clientHeight
+          @image.style.objectFit = 'cover'
+          @image.style.objectPosition = 'center 0'
           @image.src = url
         .catch (err) -> console.error err
     , if @timeout then 10 else 0

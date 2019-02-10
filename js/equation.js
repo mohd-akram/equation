@@ -43,6 +43,8 @@
         return domtoimage.toPng(this.element).then((url) => {
           this.image.width = this.element.clientWidth;
           this.image.height = this.element.clientHeight;
+          this.image.style.objectFit = 'cover';
+          this.image.style.objectPosition = 'center 0';
           return this.image.src = url;
         }).catch(function(err) {
           return console.error(err);
