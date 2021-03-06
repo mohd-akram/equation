@@ -70,6 +70,7 @@
     class Equation {
       constructor(inputBox, equationBox, resizeText = false, callback = null) {
         var parent, ref;
+        this.updateMath = this.updateMath.bind(this);
         this.keyDownHandler = this.keyDownHandler.bind(this);
         this.keyPressHandler = this.keyPressHandler.bind(this);
         this.keyUpHandler = this.keyUpHandler.bind(this);
@@ -298,10 +299,9 @@
           field.value += value;
           field.focus();
         }
-        field.dispatchEvent(new Event('input', {
+        return field.dispatchEvent(new Event('input', {
           bubbles: true
         }));
-        return this.updateMath();
       }
 
       updateBox() {
@@ -328,7 +328,11 @@
 
       updateMath() {
         var endPos, func, indexes, j, k, l, len, len1, len2, m, op, ref, ref1, regex, size, startPos, value;
-        value = this.inputBox.value;
+        if (this.inputBox.value === this.value) {
+          return;
+        }
+        this.value = this.inputBox.value;
+        value = this.value;
         // Escape backslashes
         value = value.replace(/\\/g, "\\\\");
         // Display symbols, Greek letters and functions properly
@@ -407,12 +411,8 @@
         if (key != null) {
           e.preventDefault();
           e.stopPropagation();
-          this.insertAtCursor(this.inputBox, Equation.shortcuts[key]);
+          return this.insertAtCursor(this.inputBox, Equation.shortcuts[key]);
         }
-        // Update the equation box immediately instead of waiting for keyup
-        return setTimeout((() => {
-          return this.updateMath();
-        }), 0);
       }
 
       keyPressHandler(e) {
@@ -481,6 +481,7 @@
           this.equationImage = new ElementImage(this.equationBox);
         }
         this.enableShortcuts();
+        this.inputBox.addEventListener('input', this.updateMath, false);
         this.inputBox.addEventListener('search', this.searchHandler, false);
         return this.updateMath();
       }
@@ -490,6 +491,7 @@
           this.equationImage.remove();
         }
         this.disableShortcuts();
+        this.inputBox.removeEventListener('input', this.updateMath, false);
         this.inputBox.removeEventListener('search', this.searchHandler, false);
         return this.equationBox.replaceChild(this.message, this.equationBox.firstChild);
       }

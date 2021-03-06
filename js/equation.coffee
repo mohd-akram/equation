@@ -271,8 +271,6 @@ class Equation
 
     field.dispatchEvent new Event('input', bubbles: true)
 
-    @updateMath()
-
   updateBox: ->
     if @keys
       length = @keys.length
@@ -290,8 +288,11 @@ class Equation
 
     @keys = []
 
-  updateMath: ->
-    value = @inputBox.value
+  updateMath: =>
+    return if @inputBox.value is @value
+    @value = @inputBox.value
+
+    value = @value
 
     # Escape backslashes
     value = value.replace /\\/g, "\\\\"
@@ -368,9 +369,6 @@ class Equation
       e.stopPropagation()
       @insertAtCursor(@inputBox, Equation.shortcuts[key])
 
-    # Update the equation box immediately instead of waiting for keyup
-    setTimeout((=> @updateMath()), 0)
-
   keyPressHandler: (e) =>
     key = String.fromCharCode e.which
 
@@ -423,12 +421,14 @@ class Equation
   enable: ->
     @equationImage = new ElementImage @equationBox if window.domtoimage
     @enableShortcuts()
+    @inputBox.addEventListener('input', @updateMath, false)
     @inputBox.addEventListener('search', @searchHandler, false)
     @updateMath()
 
   disable: ->
     @equationImage.remove() if @equationImage
     @disableShortcuts()
+    @inputBox.removeEventListener('input', @updateMath, false)
     @inputBox.removeEventListener('search', @searchHandler, false)
     @equationBox.replaceChild @message, @equationBox.firstChild
 
