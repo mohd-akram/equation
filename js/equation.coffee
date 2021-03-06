@@ -85,27 +85,20 @@ class Equation
 
   @funcops: Object.keys(@opregex).concat(@functions)
 
-  @filters: [
-    '\\$', '\\{', '\\}'
-    'bo', 'it', 'bi', 'sc', 'fr', 'ov'
-    'table', 'text', 'html'
-    ',', ':', ';'
-  ]
-
   constructor: (@inputBox, @equationBox, @resizeText=false, @callback=null) ->
     parent = @equationBox
+    @message = parent.firstChild ? document.createTextNode('')
 
     @equationBox = document.createElement 'div'
     @equationBox.style.display = 'inline-block'
     # Needed to avoid cut-off due to italics
     @equationBox.style.padding = '0 0.2em'
     @equationBox.style.verticalAlign = 'top'
-    @equationBox.innerHTML = parent.innerHTML
-    parent.innerHTML = ''
+    parent.removeChild parent.firstChild if parent.firstChild
+    @equationBox.appendChild @message
     parent.appendChild @equationBox
 
     @fontSize = parseFloat @equationBox.style.fontSize
-    @message = @equationBox.innerHTML
 
     # Initialize key buffer and timeout. Used for exponent/power shortcut.
     @keys = []
@@ -203,11 +196,10 @@ class Equation
         endPos = @findBracket(string, startPos)
         # Wrap function
         if endPos
-          string = "#{@removeSlashes string[...i]}{\\#{
-            @removeSlashes string[i..endPos]}}#{string[endPos + 1...]}"
+          string = "#{string[...i]}{\\#{string[i..endPos]}}#{
+            string[endPos + 1...]}"
         else
-          string = "#{@removeSlashes string[...i]}{\\#{
-            @removeSlashes string[i...]}"
+          string = "#{string[...i]}{\\#{string[i...]}"
 
     return string
 
@@ -231,26 +223,23 @@ class Equation
             if argsList.length is 2
               [under, over] =  argsList
               string = @changeBrackets(string, startPos, endPos,
-                                     '↙', "#{@removeSlashes under}}↖{#{over}")
+                                     '↙', "#{under}}↖{#{over}")
 
           # Change parentheses except for binary operators raised to a power
           else if not (op in ['/', '^'] and hasPower)
             string = @changeBrackets(string, startPos, endPos)
             # Wrap square root if followed by a power
             if op is '√' and hasPower
-              string = "#{@removeSlashes string[...i]}{#{
-                @removeSlashes string[i..endPos]}}#{string[endPos + 1...]}"
+              string = "#{string[...i]}{#{string[i..endPos]}}#{
+                string[endPos + 1...]}"
 
     return string
-
-  removeSlashes: (string) -> string.replace(/[\s`\\]+$/, '')
 
   changeBrackets: (string, startPos, endPos, prefix='', middle='') ->
     if not middle
       middle = string[startPos + 1...endPos]
 
-    prev = @removeSlashes "#{string[...startPos]}#{prefix}"
-    middle = @removeSlashes middle
+    prev = "#{string[...startPos]}#{prefix}"
 
     return "#{prev}{#{middle}}#{string[endPos + 1...]}"
 
@@ -303,13 +292,10 @@ class Equation
     @keys = []
 
   updateMath: ->
-    # Get value and remove trailing backslashes
-    value = @removeSlashes @inputBox.value
+    value = @inputBox.value
 
-    # Remove macros and special characters
-    for f in Equation.filters
-      regex = new RegExp("[\\s`\\\\]*#{f}", 'g')
-      value = value.replace(regex, f)
+    # Escape backslashes
+    value = value.replace /\\/g, "\\\\"
 
     # Display symbols, Greek letters and functions properly
     value = @findAndReplace(value, Equation.symbolregex)
@@ -333,12 +319,6 @@ class Equation
     M.trustHtml = true
     value = value.replace /\n/g, "\\html'<br>'"
 
-    # Remove whitespace except after escaped tokens
-    tokens = value.split /\s/
-    for token, i in tokens
-      tokens[i] = "#{token} " if token[0] is '\\'
-    value = tokens.join ''
-
     if value
       # Parse special operators
       for op in Equation.specialops
@@ -356,12 +336,6 @@ class Equation
       value = @parseOverbars(value)
       value = @parseMatrices(value)
 
-      # Escape string
-      value = value.replace(/&/g, '&amp;')
-                   .replace(/>/g, '&gt;')
-                   .replace(/</g, '&lt;')
-                   .replace(/"/g, '&quot;')
-
       if @resizeText
         # Resize to fit
         if value.length > 160
@@ -377,12 +351,10 @@ class Equation
           size = @fontSize
 
         @equationBox.style.fontSize = "#{size}em"
-
-      @equationBox.innerHTML = "$$#{value}$$"
-      M.parseMath @equationBox
+      @equationBox.replaceChild M.sToMathE(value), @equationBox.firstChild
 
     else
-      @equationBox.innerHTML = @message
+      @equationBox.replaceChild @message, @equationBox.firstChild
       @equationBox.style.fontSize = "#{@fontSize}em"
 
     @callback(@inputBox.value) if @callback
@@ -437,7 +409,7 @@ class Equation
 
   searchHandler: =>
     if not @inputBox.value
-      @equationBox.innerHTML = @message
+      @equationBox.replaceChild @message, @equationBox.firstChild
 
   enableShortcuts: ->
     @inputBox.addEventListener('keydown', @keyDownHandler, false)
@@ -459,7 +431,7 @@ class Equation
     @equationImage.remove() if @equationImage
     @disableShortcuts()
     @inputBox.removeEventListener('search', @searchHandler, false)
-    @equationBox.innerHTML = @message
+    @equationBox.replaceChild @message, @equationBox.firstChild
 
   needBracket: ->
     startPos = @inputBox.selectionStart

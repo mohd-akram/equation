@@ -69,7 +69,7 @@
   Equation = (function() {
     class Equation {
       constructor(inputBox, equationBox, resizeText = false, callback = null) {
-        var parent;
+        var parent, ref;
         this.keyDownHandler = this.keyDownHandler.bind(this);
         this.keyPressHandler = this.keyPressHandler.bind(this);
         this.keyUpHandler = this.keyUpHandler.bind(this);
@@ -79,16 +79,18 @@
         this.resizeText = resizeText;
         this.callback = callback;
         parent = this.equationBox;
+        this.message = (ref = parent.firstChild) != null ? ref : document.createTextNode('');
         this.equationBox = document.createElement('div');
         this.equationBox.style.display = 'inline-block';
         // Needed to avoid cut-off due to italics
         this.equationBox.style.padding = '0 0.2em';
         this.equationBox.style.verticalAlign = 'top';
-        this.equationBox.innerHTML = parent.innerHTML;
-        parent.innerHTML = '';
+        if (parent.firstChild) {
+          parent.removeChild(parent.firstChild);
+        }
+        this.equationBox.appendChild(this.message);
         parent.appendChild(this.equationBox);
         this.fontSize = parseFloat(this.equationBox.style.fontSize);
-        this.message = this.equationBox.innerHTML;
         // Initialize key buffer and timeout. Used for exponent/power shortcut.
         this.keys = [];
         this.powerTimeout = setTimeout((function() {}), 0);
@@ -218,9 +220,9 @@
             endPos = this.findBracket(string, startPos);
             // Wrap function
             if (endPos) {
-              string = `${this.removeSlashes(string.slice(0, i))}{\\${this.removeSlashes(string.slice(i, +endPos + 1 || 9e9))}}${string.slice(endPos + 1)}`;
+              string = `${string.slice(0, i)}{\\${string.slice(i, +endPos + 1 || 9e9)}}${string.slice(endPos + 1)}`;
             } else {
-              string = `${this.removeSlashes(string.slice(0, i))}{\\${this.removeSlashes(string.slice(i))}`;
+              string = `${string.slice(0, i)}{\\${string.slice(i)}`;
             }
           }
         }
@@ -247,14 +249,14 @@
                 argsList = args.split(',');
                 if (argsList.length === 2) {
                   [under, over] = argsList;
-                  string = this.changeBrackets(string, startPos, endPos, '↙', `${this.removeSlashes(under)}}↖{${over}`);
+                  string = this.changeBrackets(string, startPos, endPos, '↙', `${under}}↖{${over}`);
                 }
               // Change parentheses except for binary operators raised to a power
               } else if (!((op === '/' || op === '^') && hasPower)) {
                 string = this.changeBrackets(string, startPos, endPos);
                 // Wrap square root if followed by a power
                 if (op === '√' && hasPower) {
-                  string = `${this.removeSlashes(string.slice(0, i))}{${this.removeSlashes(string.slice(i, +endPos + 1 || 9e9))}}${string.slice(endPos + 1)}`;
+                  string = `${string.slice(0, i)}{${string.slice(i, +endPos + 1 || 9e9)}}${string.slice(endPos + 1)}`;
                 }
               }
             }
@@ -263,17 +265,12 @@
         return string;
       }
 
-      removeSlashes(string) {
-        return string.replace(/[\s`\\]+$/, '');
-      }
-
       changeBrackets(string, startPos, endPos, prefix = '', middle = '') {
         var prev;
         if (!middle) {
           middle = string.slice(startPos + 1, endPos);
         }
-        prev = this.removeSlashes(`${string.slice(0, startPos)}${prefix}`);
-        middle = this.removeSlashes(middle);
+        prev = `${string.slice(0, startPos)}${prefix}`;
         return `${prev}{${middle}}${string.slice(endPos + 1)}`;
       }
 
@@ -330,16 +327,10 @@
       }
 
       updateMath() {
-        var endPos, f, func, i, indexes, j, k, l, len, len1, len2, len3, len4, m, n, o, op, ref, ref1, ref2, regex, size, startPos, token, tokens, value;
-        // Get value and remove trailing backslashes
-        value = this.removeSlashes(this.inputBox.value);
-        ref = Equation.filters;
-        // Remove macros and special characters
-        for (k = 0, len = ref.length; k < len; k++) {
-          f = ref[k];
-          regex = new RegExp(`[\\s\`\\\\]*${f}`, 'g');
-          value = value.replace(regex, f);
-        }
+        var endPos, func, indexes, j, k, l, len, len1, len2, m, op, ref, ref1, regex, size, startPos, value;
+        value = this.inputBox.value;
+        // Escape backslashes
+        value = value.replace(/\\/g, "\\\\");
         // Display symbols, Greek letters and functions properly
         value = this.findAndReplace(value, Equation.symbolregex);
         value = this.findAndReplace(value, Equation.symbol2regex);
@@ -349,10 +340,10 @@
         // Allow d/dx without parentheses
         regex = new RegExp('/(d|∂)(x|y|z|t)', 'g');
         value = value.replace(regex, '/{$1$2}');
-        ref1 = Equation.functions;
+        ref = Equation.functions;
         // Parse functions
-        for (l = 0, len1 = ref1.length; l < len1; l++) {
-          func = ref1[l];
+        for (k = 0, len = ref.length; k < len; k++) {
+          func = ref[k];
           value = this.parseFunction(value, func);
         }
         value = this.parseOperator(value, 'lim');
@@ -360,26 +351,17 @@
         M.MathPlayer = false;
         M.trustHtml = true;
         value = value.replace(/\n/g, "\\html'<br>'");
-        // Remove whitespace except after escaped tokens
-        tokens = value.split(/\s/);
-        for (i = m = 0, len2 = tokens.length; m < len2; i = ++m) {
-          token = tokens[i];
-          if (token[0] === '\\') {
-            tokens[i] = `${token} `;
-          }
-        }
-        value = tokens.join('');
         if (value) {
-          ref2 = Equation.specialops;
+          ref1 = Equation.specialops;
           // Parse special operators
-          for (n = 0, len3 = ref2.length; n < len3; n++) {
-            op = ref2[n];
+          for (l = 0, len1 = ref1.length; l < len1; l++) {
+            op = ref1[l];
             value = this.parseOperator(value, op);
           }
           // Remove parentheses before division sign
           indexes = this.findAllIndexes(value, '/');
-          for (o = 0, len4 = indexes.length; o < len4; o++) {
-            j = indexes[o];
+          for (m = 0, len2 = indexes.length; m < len2; m++) {
+            j = indexes[m];
             if (value[j - 1] === ')') {
               endPos = j - 1;
               startPos = this.findBracket(value, endPos, true);
@@ -390,8 +372,6 @@
           }
           value = this.parseOverbars(value);
           value = this.parseMatrices(value);
-          // Escape string
-          value = value.replace(/&/g, '&amp;').replace(/>/g, '&gt;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
           if (this.resizeText) {
             // Resize to fit
             if (value.length > 160) {
@@ -405,10 +385,9 @@
             }
             this.equationBox.style.fontSize = `${size}em`;
           }
-          this.equationBox.innerHTML = `$$${value}$$`;
-          M.parseMath(this.equationBox);
+          this.equationBox.replaceChild(M.sToMathE(value), this.equationBox.firstChild);
         } else {
-          this.equationBox.innerHTML = this.message;
+          this.equationBox.replaceChild(this.message, this.equationBox.firstChild);
           this.equationBox.style.fontSize = `${this.fontSize}em`;
         }
         if (this.callback) {
@@ -481,7 +460,7 @@
 
       searchHandler() {
         if (!this.inputBox.value) {
-          return this.equationBox.innerHTML = this.message;
+          return this.equationBox.replaceChild(this.message, this.equationBox.firstChild);
         }
       }
 
@@ -512,7 +491,7 @@
         }
         this.disableShortcuts();
         this.inputBox.removeEventListener('search', this.searchHandler, false);
-        return this.equationBox.innerHTML = this.message;
+        return this.equationBox.replaceChild(this.message, this.equationBox.firstChild);
       }
 
       needBracket() {
@@ -646,8 +625,6 @@
     }).bind(Equation)();
 
     Equation.funcops = Object.keys(Equation.opregex).concat(Equation.functions);
-
-    Equation.filters = ['\\$', '\\{', '\\}', 'bo', 'it', 'bi', 'sc', 'fr', 'ov', 'table', 'text', 'html', ',', ':', ';'];
 
     return Equation;
 
