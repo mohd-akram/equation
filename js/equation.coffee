@@ -88,6 +88,7 @@ class Equation
   constructor: (@inputBox, @equationBox, @resizeText=false, @callback=null) ->
     parent = @equationBox
     @message = parent.firstChild ? document.createTextNode('')
+    @fontSize = parseFloat window.getComputedStyle(parent).fontSize
 
     @equationBox = document.createElement 'div'
     @equationBox.style.display = 'inline-block'
@@ -97,8 +98,6 @@ class Equation
     parent.removeChild parent.firstChild if parent.firstChild
     @equationBox.appendChild @message
     parent.appendChild @equationBox
-
-    @fontSize = parseFloat @equationBox.style.fontSize
 
     # Initialize key buffer and timeout. Used for exponent/power shortcut.
     @keys = []
@@ -339,23 +338,23 @@ class Equation
       if @resizeText
         # Resize to fit
         if value.length > 160
-          size = @fontSize - 1.2
+          size = @fontSize * 0.25
 
         else if value.length > 80
-          size = @fontSize - 0.8
+          size = @fontSize * 0.5
 
         else if value.length > 40
-          size = @fontSize - 0.4
+          size = @fontSize * 0.75
 
         else
           size = @fontSize
 
-        @equationBox.style.fontSize = "#{size}em"
+        @equationBox.style.fontSize = "#{size}px"
       @equationBox.replaceChild M.sToMathE(value), @equationBox.firstChild
 
     else
       @equationBox.replaceChild @message, @equationBox.firstChild
-      @equationBox.style.fontSize = "#{@fontSize}em"
+      @equationBox.style.fontSize = ""
 
     @callback(@inputBox.value) if @callback
 

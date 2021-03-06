@@ -80,6 +80,7 @@
         this.callback = callback;
         parent = this.equationBox;
         this.message = (ref = parent.firstChild) != null ? ref : document.createTextNode('');
+        this.fontSize = parseFloat(window.getComputedStyle(parent).fontSize);
         this.equationBox = document.createElement('div');
         this.equationBox.style.display = 'inline-block';
         // Needed to avoid cut-off due to italics
@@ -90,7 +91,6 @@
         }
         this.equationBox.appendChild(this.message);
         parent.appendChild(this.equationBox);
-        this.fontSize = parseFloat(this.equationBox.style.fontSize);
         // Initialize key buffer and timeout. Used for exponent/power shortcut.
         this.keys = [];
         this.powerTimeout = setTimeout((function() {}), 0);
@@ -375,20 +375,20 @@
           if (this.resizeText) {
             // Resize to fit
             if (value.length > 160) {
-              size = this.fontSize - 1.2;
+              size = this.fontSize * 0.25;
             } else if (value.length > 80) {
-              size = this.fontSize - 0.8;
+              size = this.fontSize * 0.5;
             } else if (value.length > 40) {
-              size = this.fontSize - 0.4;
+              size = this.fontSize * 0.75;
             } else {
               size = this.fontSize;
             }
-            this.equationBox.style.fontSize = `${size}em`;
+            this.equationBox.style.fontSize = `${size}px`;
           }
           this.equationBox.replaceChild(M.sToMathE(value), this.equationBox.firstChild);
         } else {
           this.equationBox.replaceChild(this.message, this.equationBox.firstChild);
-          this.equationBox.style.fontSize = `${this.fontSize}em`;
+          this.equationBox.style.fontSize = "";
         }
         if (this.callback) {
           return this.callback(this.inputBox.value);
