@@ -6,40 +6,46 @@
 
   button.type = 'button';
 
+  button.id = 'quickEquations';
+
   imgURL = chrome.extension.getURL('icon.png');
 
   button.innerHTML = `<img src=\"${imgURL}\" alt=\"Quick Equations\">`;
 
-  observer = new MutationObserver(function(mutations) {
-    var i, len, mutation, optionsDiv;
-    optionsDiv = null;
-    for (i = 0, len = mutations.length; i < len; i++) {
-      mutation = mutations[i];
-      optionsDiv = mutation.target.querySelector('.input-bottom-buttons');
-      if (optionsDiv) {
-        break;
-      }
+  observer = new MutationObserver(function() {
+    var buttons, c, i, len, ref, ref1, ref2;
+    if (document.querySelector('#quickEquations')) {
+      return;
     }
-    if (optionsDiv) {
-      optionsDiv.appendChild(button);
-      return observer.disconnect();
+    buttons = (ref = document.querySelector('#random')) != null ? (ref1 = ref.closest('ul')) != null ? ref1.previousElementSibling : void 0 : void 0;
+    if (buttons) {
+      ref2 = buttons.querySelector('button').classList;
+      for (i = 0, len = ref2.length; i < len; i++) {
+        c = ref2[i];
+        button.classList.add(c);
+      }
+      return buttons.prepend(button);
     }
   });
 
   observer.observe(document.body, {
-    childList: true
+    childList: true,
+    subtree: true
   });
 
   equation = null;
 
   button.onclick = function(e) {
-    var equationBox;
+    var equationBox, menu, query, view;
     equationBox = window.equationBox;
+    menu = button.closest('ul').parentElement;
+    view = menu.parentElement;
     if (!equationBox) {
       equationBox = document.createElement('div');
       equationBox.id = 'equationBox';
       equationBox.innerHTML = 'Type an equation above';
-      view.insertBefore(equationBox, view.firstChild);
+      view.insertBefore(equationBox, menu);
+      query = view.querySelector('input');
       equation = new Equation(query, equationBox);
     } else {
       equation.disable();

@@ -1,29 +1,32 @@
 button = document.createElement 'button'
 button.type = 'button'
+button.id = 'quickEquations'
 
 imgURL = chrome.extension.getURL 'icon.png'
 
 button.innerHTML = "<img src=\"#{imgURL}\" alt=\"Quick Equations\">"
 
-observer = new MutationObserver (mutations) ->
-  optionsDiv = null
-  for mutation in mutations
-    optionsDiv = mutation.target.querySelector '.input-bottom-buttons'
-    break if optionsDiv
-  if optionsDiv
-    optionsDiv.appendChild button
-    observer.disconnect()
-observer.observe document.body, childList: true
+observer = new MutationObserver ->
+  return if document.querySelector '#quickEquations'
+  buttons =
+    document.querySelector('#random')?.closest('ul')?.previousElementSibling
+  if buttons
+    button.classList.add c for c in buttons.querySelector('button').classList
+    buttons.prepend button
+observer.observe document.body, childList: true, subtree: true
 
 equation = null
 
 button.onclick = (e) ->
   equationBox = window.equationBox
+  menu = button.closest('ul').parentElement
+  view = menu.parentElement
   if not equationBox
     equationBox = document.createElement 'div'
     equationBox.id = 'equationBox'
     equationBox.innerHTML = 'Type an equation above'
-    view.insertBefore equationBox, view.firstChild
+    view.insertBefore equationBox, menu
+    query = view.querySelector 'input'
     equation = new Equation(query, equationBox)
   else
     equation.disable()

@@ -281,7 +281,7 @@ class Equation
       field.value += value
       field.focus()
 
-    field.dispatchEvent new Event('input')
+    field.dispatchEvent new Event('input', bubbles: true)
 
     @updateMath()
 
