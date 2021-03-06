@@ -3,8 +3,10 @@ button.type = 'button'
 button.id = 'quickEquations'
 
 imgURL = chrome.extension.getURL 'icon.png'
-
-button.innerHTML = "<img src=\"#{imgURL}\" alt=\"Quick Equations\">"
+img = document.createElement 'img'
+img.src = imgURL
+img.alt = 'Quick Equations'
+button.appendChild img
 
 observer = new MutationObserver ->
   return if document.querySelector '#quickEquations'
