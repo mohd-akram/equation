@@ -35,7 +35,7 @@ loadEquations = (tab) ->
               code: 'fmath.ma-block { text-align: left }'
 
         chrome.tabs.executeScript tab.id,
-          file: 'vendor/jquery-3.3.1.min.js', ->
+          file: 'vendor/jquery-3.6.0.min.js', ->
             chrome.tabs.executeScript tab.id,
               file: 'vendor/jqmath-etc-0.4.6.min.js', ->
                 chrome.tabs.executeScript tab.id,

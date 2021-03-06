@@ -25,6 +25,6 @@
   },
   "homepage": "https://github.com/mohd-akram/equation#readme",
   "devDependencies": {
-    "coffeescript": "^2.3.2"
+    "coffeescript": "^2.5.1"
   }
 }
