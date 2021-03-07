@@ -2,12 +2,7 @@ imgURL = chrome.extension.getURL 'icon.png'
 
 className = 'qe-input-box'
 
-inputBoxes = window.inputBoxes || []
-
-shortResponseClassName =
-  'freebirdFormeditorViewResponsesQuestionviewItemsShortText'
-longResponseClassName =
-  'freebirdFormeditorViewResponsesQuestionviewItemsLongText'
+inputBoxes = window.inputBoxes ? []
 
 removeOldEquations = (equations) ->
   month = 30 * 24 * 60 * 60 * 1000
@@ -17,35 +12,30 @@ removeOldEquations = (equations) ->
 
 rememberEquation = (equation) ->
   chrome.storage.sync.get 'knownEquations', (items) ->
-    knownEquations = items.knownEquations || {}
+    knownEquations = items.knownEquations ? {}
     removeOldEquations knownEquations
     knownEquations[equation] = Date.now()
     chrome.storage.sync.set knownEquations: knownEquations
 
 forgetEquation = (equation) ->
   chrome.storage.sync.get 'knownEquations', (items) ->
-    knownEquations = items.knownEquations || {}
+    knownEquations = items.knownEquations ? {}
     removeOldEquations knownEquations
     delete knownEquations[equation]
     chrome.storage.sync.set knownEquations: knownEquations
 
 knownEquation = (equation, callback) ->
   chrome.storage.sync.get 'knownEquations', (items) ->
-    knownEquations = items.knownEquations || {}
+    knownEquations = items.knownEquations ? {}
     callback equation of knownEquations
 
 enableInputBox = (element) ->
-  return unless element
+  return if not element or element.classList.contains className
   wrapper = element.closest '
-    .freebirdFormviewerViewItemsTextItemWrapper,
-    .freebirdFormviewerViewItemsTextLongText,
-    .freebirdFormeditorViewResponsesQuestionviewQuestionAnswerPreview
+    .freebirdFormviewerComponentsQuestionTextRoot,
+    .freebirdFormviewerViewItemsTextTextItemContainer
   '
   return unless wrapper
-  return if (
-    element.classList.contains(className) or
-    element.getElementsByClassName(className).length
-  )
 
   element.classList.add className
 
@@ -60,32 +50,26 @@ enableInputBox = (element) ->
   button.style.border = 'none'
   button.style.cursor = 'pointer'
   button.style.padding = '0'
-  button.style.marginLeft = '5px'
 
   button.appendChild image
 
   # Avoid highlighting input element on click
   button.onmousedown = (e) -> e.preventDefault()
 
-  elementValue = -> element.value || element.innerHTML
+  elementValue = -> element.value ? element.textContent
 
   equation = null
   equationBox = null
 
+  isInput = element.tagName in ['INPUT', 'TEXTAREA']
+
   show = ->
     rememberEquation elementValue()
     equationBox = document.createElement 'div'
-    equationBox.style.display = 'inline-block'
     equationBox.style.marginTop = '5px'
     equationBox.style.fontSize = '1.5em'
-    isResponse =
-      element.classList.contains(shortResponseClassName) or
-      element.classList.contains(longResponseClassName)
-    if isResponse
-      equationBox.style.paddingTop = '20px'
-      equationBox.style.paddingLeft = '36px'
     wrapper.parentNode.insertBefore equationBox, wrapper
-    if element.tagName in ['INPUT', 'TEXTAREA']
+    if isInput
       inputBox = element
     else
       inputBox = document.createElement 'textarea'
@@ -106,18 +90,22 @@ enableInputBox = (element) ->
 
   knownEquation elementValue(), (known) -> show() if known
 
-  element.parentNode.insertBefore button, element.nextSibling
+  if isInput
+    element.parentNode.insertBefore button, element.nextSibling
+  else
+    button.style.float = 'right'
+    element.appendChild button
 
 enableInputBox inputBox for inputBox in inputBoxes
 
 observer = new MutationObserver (mutations) ->
   for mutation in mutations
-    inputBoxes = mutation.target.querySelectorAll "
+    inputBoxes = mutation.target.querySelectorAll '
+      .quantumWizTextinputPaperinputInput,
+      .quantumWizTextinputPapertextareaInput,
       .freebirdFormviewerViewItemsTextShortText,
-      .freebirdFormviewerViewItemsTextLongText,
-      .#{shortResponseClassName},
-      .#{longResponseClassName}
-    "
+      .freebirdFormviewerViewItemsTextLongText
+    '
     for inputBox in inputBoxes
       inputBox.style.display = 'inline-block'
       enableInputBox inputBox
@@ -144,10 +132,11 @@ imageToDataURL = (img, width, height) ->
 
   canvas.toDataURL()
 
-picker = document.querySelector('#doclist')?.querySelector 'div'
+picker = Array.from(document.querySelectorAll('[jsaction*=drop]')).pop()
 
 if picker
   picker.addEventListener 'drop', (e) ->
+    e.preventDefault()
     url = e.dataTransfer.getData 'text/uri-list'
     return unless url.startsWith 'data:image/png;base64,'
     img = document.createElement 'img'
@@ -156,4 +145,5 @@ if picker
       dt = createDataTransfer url, 'equation.png'
       input = picker.querySelector 'input[type=file]'
       input.files = dt.files
+      input.dispatchEvent new Event 'change', bubbles: true
     img.src = url

@@ -14,8 +14,10 @@ loadEquations = (tab) ->
 
   selector =
     if isGoogleForms tab.url then '
-      input.quantumWizTextinputPaperinputInput,
-      textarea.quantumWizTextinputPapertextareaInput
+      .quantumWizTextinputPaperinputInput,
+      .quantumWizTextinputPapertextareaInput,
+      .freebirdFormviewerViewItemsTextShortText,
+      .freebirdFormviewerViewItemsTextLongText
     ' else 'input[id*=AnSwEr]'
 
   getInputBoxes =

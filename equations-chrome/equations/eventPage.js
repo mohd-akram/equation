@@ -27,7 +27,7 @@
     if (isGoogleForms(tab.url) && !chrome.webNavigation) {
       return;
     }
-    selector = isGoogleForms(tab.url) ? 'input.quantumWizTextinputPaperinputInput, textarea.quantumWizTextinputPapertextareaInput' : 'input[id*=AnSwEr]';
+    selector = isGoogleForms(tab.url) ? '.quantumWizTextinputPaperinputInput, .quantumWizTextinputPapertextareaInput, .freebirdFormviewerViewItemsTextShortText, .freebirdFormviewerViewItemsTextLongText' : 'input[id*=AnSwEr]';
     getInputBoxes = `inputBoxes = document.querySelectorAll('${selector}');
 inputBoxes.length`;
     return chrome.tabs.executeScript(tab.id, {
