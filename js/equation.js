@@ -231,7 +231,7 @@
       }
 
       parseOperator(string, op) {
-        var args, argsList, endPos, hasPower, i, indexes, k, len, over, ref, startPos, under;
+        var args, argsList, endPos, hasPower, i, index, indexes, k, len, over, ref, startPos, under, value;
         indexes = this.findAllIndexes(string, op);
         ref = indexes.reverse();
         for (k = 0, len = ref.length; k < len; k++) {
@@ -245,20 +245,25 @@
               if (op === 'lim') {
                 string = this.changeBrackets(string, startPos, endPos, '↙');
               // Functions with overscript and underscript
-              } else if (op === '∫' || op === '∑' || op === '∏') {
+              } else if (op === '∫' || op === '∑' || op === '∏' || op === '√^') {
                 args = string.slice(startPos + 1, endPos);
                 argsList = args.split(',');
                 if (argsList.length === 2) {
-                  [under, over] = argsList;
-                  string = this.changeBrackets(string, startPos, endPos, '↙', `${under}}↖{${over}`);
+                  if (op === '√^') {
+                    [value, index] = argsList;
+                    string = this.changeBrackets(string, startPos, endPos, '', `${index}}{${value}`);
+                  } else {
+                    [under, over] = argsList;
+                    string = this.changeBrackets(string, startPos, endPos, '↙', `${under}}↖{${over}`);
+                  }
                 }
               // Change parentheses except for binary operators raised to a power
               } else if (!((op === '/' || op === '^') && hasPower)) {
                 string = this.changeBrackets(string, startPos, endPos);
-                // Wrap square root if followed by a power
-                if (op === '√' && hasPower) {
-                  string = `${string.slice(0, i)}{${string.slice(i, +endPos + 1 || 9e9)}}${string.slice(endPos + 1)}`;
-                }
+              }
+              // Wrap root if followed by a power
+              if ((op === '√' || op === '√^' || op === '√^3') && hasPower) {
+                string = `${string.slice(0, i)}{${string.slice(i, +endPos + 1 || 9e9)}}${string.slice(endPos + 1)}`;
               }
             }
           }
@@ -600,13 +605,15 @@
 
     Equation.opregex = {
       'lim': '\\lim',
+      'cbrt': '√^3',
+      'root': '√^',
       'sqrt': '√',
       'int': '∫',
       'sum': '∑',
       'prod': '∏'
     };
 
-    Equation.specialops = ['^', '_', '/', '√', '∫', '∑', '∏'];
+    Equation.specialops = ['_', '/', '√^3', '√^', '√', '^', '∫', '∑', '∏'];
 
     Equation.functions = ['exp', 'log', 'ln', 'sinc'];
 

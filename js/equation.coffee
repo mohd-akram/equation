@@ -67,9 +67,11 @@ class Equation
 
   @letter2regex: 'eta': 'η', 'psi': 'ψ', 'del': '∇'
 
-  @opregex: 'lim': '\\lim', 'sqrt': '√', 'int': '∫', 'sum': '∑', 'prod': '∏'
+  @opregex:
+    'lim': '\\lim', 'cbrt': '√^3', 'root': '√^', 'sqrt': '√', 'int': '∫'
+    'sum': '∑', 'prod': '∏'
 
-  @specialops: ['^', '_', '/', '√', '∫', '∑', '∏']
+  @specialops: ['_', '/', '√^3', '√^', '√', '^', '∫', '∑', '∏']
 
   @functions: ['exp', 'log', 'ln', 'sinc']
 
@@ -215,22 +217,28 @@ class Equation
             string = @changeBrackets(string, startPos, endPos, '↙')
 
           # Functions with overscript and underscript
-          else if op in ['∫', '∑', '∏']
+          else if op in ['∫', '∑', '∏', '√^']
             args = string[startPos + 1...endPos]
             argsList = args.split ','
 
             if argsList.length is 2
-              [under, over] =  argsList
-              string = @changeBrackets(string, startPos, endPos,
-                                     '↙', "#{under}}↖{#{over}")
+              if op is '√^'
+                [value, index] = argsList
+                string = @changeBrackets(string, startPos, endPos,
+                                      '', "#{index}}{#{value}")
+              else
+                [under, over] =  argsList
+                string = @changeBrackets(string, startPos, endPos,
+                                      '↙', "#{under}}↖{#{over}")
 
           # Change parentheses except for binary operators raised to a power
           else if not (op in ['/', '^'] and hasPower)
             string = @changeBrackets(string, startPos, endPos)
-            # Wrap square root if followed by a power
-            if op is '√' and hasPower
-              string = "#{string[...i]}{#{string[i..endPos]}}#{
-                string[endPos + 1...]}"
+
+          # Wrap root if followed by a power
+          if (op is '√' or op is '√^' or op is '√^3') and hasPower
+            string = "#{string[...i]}{#{string[i..endPos]}}#{
+              string[endPos + 1...]}"
 
     return string
 
