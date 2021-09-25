@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Fast Equation Editor</title>
+    <title>equation.js</title>
 
     <link rel="stylesheet" href="css/jqmath-0.4.3.css">
     <link rel="stylesheet" href="css/main.css">
@@ -10,8 +10,19 @@
     <script src="js/jquery-3.6.0.min.js"></script>
     <script src="js/jqmath-etc-0.4.6.min.js"></script>
     <script src="js/dom-to-image.js"></script>
+    <script src="js/clipboard.min.js"></script>
 
     <script src="js/equation.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-40999116-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-40999116-1');
+    </script>
   </head>
   <body>
     <div id="body">
@@ -46,12 +57,49 @@
       <div id="equationBox" style="font-size:2.5em;">Type an equation below</div>
       <form action="https://www.wolframalpha.com/input/">
         <input name="i" id="inputBox" type="search" size="40">
+        <button type="button" id="copyButton" style="position: absolute;
+          height: 30px;">Copy Link</button>
+        <br>
+        <label id="copyMessage" style="display: none; position: relative;
+          left: 45ch; bottom: 15px">Copied.</label>
         <br>
         <input id="button" type="submit" value="WolframAlpha">
       </form>
+      <a id="chromeLink"
+        href="https://chrome.google.com/webstore/detail/pnhnfjbdadnnicpliempeidfminbflon">
+        <img style="position: absolute; bottom: 0; right: 0;" width="200" alt="Chrome extension link"
+          src="https://storage.googleapis.com/chrome-gcs-uploader.appspot.com/image/WlD8wC6g8khYWPJUsQceQkhXSlv1/YT2Grfi9vEBa2wAPzhWa.png">
+      </a>
     </div>
-    <script>var equation = new Equation(document.getElementById('inputBox'),
-                                        document.getElementById('equationBox'), true)
+    <script>
+      var title = document.title;
+      var inputBox = document.getElementById('inputBox');
+
+      if (window.location.hash)
+        inputBox.value = decodeURIComponent(window.location.hash.slice(1));
+      else
+        inputBox.value = 'e^(i pi) + 1 = 0'
+
+      var equation = new Equation(
+        inputBox,
+        document.getElementById('equationBox'),
+        true,
+        function(value) {document.title = value || title}
+      );
+
+      var clip = new ClipboardJS('#copyButton', {
+        text: function() {
+          return 'https://git.io/equation' +
+                 '#' + encodeURIComponent($('#inputBox').val());
+        }
+      });
+
+      clip.on('success', function(e) {
+        $('#copyMessage').show('slow').delay(1000).fadeOut();
+      });
+
+      if (typeof chrome === 'undefined')
+        document.getElementById('chromeLink').style.display = 'none';
     </script>
   </body>
 </html>
