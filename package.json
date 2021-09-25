@@ -8,7 +8,8 @@
     "build-chrome": "cp js/equation.js equations-chrome/equations && coffee -cm equations-chrome/equations",
     "watch": "coffee -cmw js/equation.coffee",
     "watch-chrome": "coffee -cmw equations-chrome/equations",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "zip": "cd equations-chrome/equations && rm -f ../equations.zip && zip -r ../equations.zip . -x '*.coffee' '*.map'"
   },
   "repository": {
     "type": "git",
