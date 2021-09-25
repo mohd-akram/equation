@@ -27,20 +27,27 @@ body {
   font-family: 'Segoe UI', Tahoma, sans-serif;
 }
 
-.shortcuts {
-  text-align: right;
-  width: 215px;
-  position: absolute;
-  right: 10px;
-  font-size: 1em;
+.help {
+  text-align: left;
+  font-size: 0.9em;
   color: #999;
+  position: absolute;
+  width: 215px;
 }
 
-.outer .inner {
-  display: none;
-  margin-left: 10px;
+.help summary {
+  margin-bottom: 10px;
 }
 
-.outer:hover .inner {
-  display: block;
+.shortcuts {
+  margin-bottom: 10px;
+}
+
+.shortcuts ul {
+  padding-left: 15px;
+  margin-top: 2px;
+}
+
+.operators tr td:first-child {
+  padding-right: 10px;
 }

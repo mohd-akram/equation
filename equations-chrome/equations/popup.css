@@ -33,17 +33,30 @@ body {
   font-family: 'Segoe UI', Tahoma, sans-serif;
 }
 
-.shortcuts {
+.help {
   text-align: left;
   font-size: 0.9em;
   color: #999;
 }
 
-.outer .inner {
-  display: none;
-  margin-left: 10px;
+.help summary {
+  margin-bottom: 5px;
 }
 
-.outer:hover .inner {
-  display: block;
+.shortcuts {
+  max-width: 49%;
+  float: left;
+}
+
+.shortcuts ul {
+  padding-left: 15px;
+  margin-top: 2px;
+}
+
+.operators {
+  float: right;
+}
+
+.operators tr td:first-child {
+  padding-right: 5px;
 }

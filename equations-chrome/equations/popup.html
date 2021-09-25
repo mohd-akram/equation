@@ -19,15 +19,34 @@
       <div id="equationBox">Type an equation below</div>
       <input name="i" id="inputBox" type="search" size="42">
       <br>
-      <div class="outer shortcuts"><b>Shortcuts</b>
-        <div class="inner shortcuts">
-          Addition uses ; Multiplication uses ' Derivative uses `<br>
-          Quickly press a letter n times to get the nth power<br>
-          For parentheses, use [ and ].<br>
-          Use Shift + ] to close all parentheses.<br>
-          Use Up arrow for superscript, Down arrow for subscript
+      <details class="help"><summary><b>Help</b></summary>
+        <div>
+          <div class="shortcuts">
+            <b>Shortcuts</b>
+            <ul>
+              <li>Addition uses ;</li>
+              <li>Multiplication uses '</li>
+              <li>Derivative uses `</li>
+              <li>Quickly press a letter n times to get the nth power</li>
+              <li>Parentheses use [ and ]</li>
+              <li>Use Shift + ] to close all parentheses</li>
+              <li>Use Up arrow for superscript, Down arrow for subscript</li>
+            </ul>
+          </div>
+          <div class="operators">
+            <b>Operators</b>
+            <table>
+              <tr><td>square root</td><td>sqrt(x)</td></tr>
+              <tr><td>cube root</td><td>cbrt(x)</td></tr>
+              <tr><td>nth root</td><td>root(x,n)</td></tr>
+              <tr><td>limit</td><td>lim(x->c)</td></tr>
+              <tr><td>integral</td><td>int(a,b)</td></tr>
+              <tr><td>sum</td><td>sum(i=a,b)</td></tr>
+              <tr><td>product</td><td>prod(i=a,b)</td></tr>
+            </table>
+          </div>
         </div>
-      </div>
+      </details>
     </div>
   </body>
 
