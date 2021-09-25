@@ -2,6 +2,10 @@ button = document.createElement 'button'
 button.type = 'button'
 button.id = 'quickEquations'
 
+# wrap in a div because otherwise it gets mixed with another button
+div = document.createElement 'div'
+div.appendChild button
+
 imgURL = chrome.extension.getURL 'icon.png'
 img = document.createElement 'img'
 img.src = imgURL
@@ -10,18 +14,17 @@ button.appendChild img
 
 observer = new MutationObserver ->
   return if document.querySelector '#quickEquations'
-  buttons =
-    document.querySelector('#random')?.closest('ul')?.previousElementSibling
+  buttons = document.querySelector('[href="/examples"]')?.closest('nav')
   if buttons
     button.classList.add c for c in buttons.querySelector('button').classList
-    buttons.prepend button
+    buttons.prepend div
 observer.observe document.body, childList: true, subtree: true
 
 equation = null
 
 button.onclick = (e) ->
   equationBox = window.equationBox
-  menu = button.closest('ul').parentElement
+  menu = button.closest('nav').parentElement
   view = menu.parentElement
   if not equationBox
     equationBox = document.createElement 'div'
