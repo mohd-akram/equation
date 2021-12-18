@@ -14,7 +14,7 @@ button.appendChild img
 
 observer = new MutationObserver ->
   return if document.querySelector '#quickEquations'
-  buttons = document.querySelector('[href="/examples"]')?.closest('nav')
+  buttons = document.querySelector('[href*="/examples"]')?.closest('nav')
   if buttons
     button.classList.add c for c in buttons.querySelector('button').classList
     buttons.prepend div

@@ -28,7 +28,7 @@
     if (document.querySelector('#quickEquations')) {
       return;
     }
-    buttons = (ref = document.querySelector('[href="/examples"]')) != null ? ref.closest('nav') : void 0;
+    buttons = (ref = document.querySelector('[href*="/examples"]')) != null ? ref.closest('nav') : void 0;
     if (buttons) {
       ref1 = buttons.querySelector('button').classList;
       for (i = 0, len = ref1.length; i < len; i++) {
