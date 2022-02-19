@@ -28,8 +28,8 @@
         "wolfram.css"
       ],
       "matches": [
-        "http://www.wolframalpha.com/input/*",
-        "https://www.wolframalpha.com/input/*"
+        "http://www.wolframalpha.com/input*",
+        "https://www.wolframalpha.com/input*"
       ]
     }
   ],
