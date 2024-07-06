@@ -13,7 +13,7 @@
 
   div.appendChild(button);
 
-  imgURL = chrome.extension.getURL('icon.png');
+  imgURL = chrome.runtime.getURL('icon.png');
 
   img = document.createElement('img');
 

@@ -2,7 +2,7 @@
 (function() {
   var className, createDataTransfer, enableInputBox, forgetEquation, i, imageToDataURL, imgURL, inputBox, inputBoxes, knownEquation, len, observer, picker, ref, rememberEquation, removeOldEquations;
 
-  imgURL = chrome.extension.getURL('icon.png');
+  imgURL = chrome.runtime.getURL('icon.png');
 
   className = 'qe-input-box';
 
@@ -23,40 +23,37 @@
     return results;
   };
 
-  rememberEquation = function(equation) {
-    return chrome.storage.sync.get('knownEquations', function(items) {
-      var knownEquations, ref1;
-      knownEquations = (ref1 = items.knownEquations) != null ? ref1 : {};
-      removeOldEquations(knownEquations);
-      knownEquations[equation] = Date.now();
-      return chrome.storage.sync.set({
-        knownEquations: knownEquations
-      });
-    });
+  rememberEquation = async function(equation) {
+    var items, knownEquations, ref1;
+    items = (await chrome.storage.sync.get('knownEquations'));
+    knownEquations = (ref1 = items.knownEquations) != null ? ref1 : {};
+    removeOldEquations(knownEquations);
+    knownEquations[equation] = Date.now();
+    return (await chrome.storage.sync.set({
+      knownEquations: knownEquations
+    }));
   };
 
-  forgetEquation = function(equation) {
-    return chrome.storage.sync.get('knownEquations', function(items) {
-      var knownEquations, ref1;
-      knownEquations = (ref1 = items.knownEquations) != null ? ref1 : {};
-      removeOldEquations(knownEquations);
-      delete knownEquations[equation];
-      return chrome.storage.sync.set({
-        knownEquations: knownEquations
-      });
-    });
+  forgetEquation = async function(equation) {
+    var items, knownEquations, ref1;
+    items = (await chrome.storage.sync.get('knownEquations'));
+    knownEquations = (ref1 = items.knownEquations) != null ? ref1 : {};
+    removeOldEquations(knownEquations);
+    delete knownEquations[equation];
+    return (await chrome.storage.sync.set({
+      knownEquations: knownEquations
+    }));
   };
 
-  knownEquation = function(equation, callback) {
-    return chrome.storage.sync.get('knownEquations', function(items) {
-      var knownEquations, ref1;
-      knownEquations = (ref1 = items.knownEquations) != null ? ref1 : {};
-      return callback(equation in knownEquations);
-    });
+  knownEquation = async function(equation) {
+    var items, knownEquations, ref1;
+    items = (await chrome.storage.sync.get('knownEquations'));
+    knownEquations = (ref1 = items.knownEquations) != null ? ref1 : {};
+    return equation in knownEquations;
   };
 
-  enableInputBox = function(element) {
-    var button, elementValue, equation, equationBox, hide, image, isInput, ref1, show, wrapper;
+  enableInputBox = async function(element) {
+    var button, elementValue, equation, equationBox, hide, image, isInput, known, ref1, show, wrapper;
     if (!element || element.classList.contains(className)) {
       return;
     }
@@ -119,11 +116,10 @@
         return element.focus();
       }
     };
-    knownEquation(elementValue(), function(known) {
-      if (known) {
-        return show();
-      }
-    });
+    known = (await knownEquation(elementValue()));
+    if (known) {
+      show();
+    }
     if (isInput) {
       return element.parentNode.insertBefore(button, element.nextSibling);
     } else {

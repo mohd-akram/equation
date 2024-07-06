@@ -2,18 +2,16 @@
   "name": "Quick Equations",
   "short_name": "Quick Eqs",
   "version": "1.6.2",
-  "manifest_version": 2,
+  "manifest_version": 3,
   "description": "A fast, shortcut based equation editor with realtime preview and WolframAlpha, WeBWorK and Google Forms support.",
-  "browser_action": {
+  "action": {
     "default_icon": "icon.png",
     "default_popup": "popup.html"
   },
   "options_page": "options.html",
   "background": {
-    "scripts": [
-      "eventPage.js"
-    ],
-    "persistent": false
+    "service_worker": "service_worker.js",
+    "type": "module"
   },
   "content_scripts": [
     {
@@ -23,23 +21,13 @@
         "equation.js",
         "wolfram.js"
       ],
-      "css": [
-        "vendor/jqmath-0.4.3.css",
-        "wolfram.css"
-      ],
-      "matches": [
-        "http://www.wolframalpha.com/input*",
-        "https://www.wolframalpha.com/input*"
-      ]
+      "css": ["vendor/jqmath-0.4.3.css", "wolfram.css"],
+      "matches": ["https://www.wolframalpha.com/input*"]
     }
   ],
-  "permissions": [
-    "storage"
-  ],
-  "optional_permissions": [
-    "tabs",
-    "webNavigation",
-    "http://docs.google.com/*",
+  "permissions": ["storage"],
+  "optional_permissions": ["scripting", "tabs", "webNavigation"],
+  "optional_host_permissions": [
     "https://docs.google.com/*",
     "http://*/*",
     "https://*/*"
@@ -49,6 +37,9 @@
     "128": "icon128.png"
   },
   "web_accessible_resources": [
-    "icon.png"
+    {
+      "resources": ["icon.png"],
+      "matches": ["https://www.wolframalpha.com/*", "https://docs.google.com/*"]
+    }
   ]
 }

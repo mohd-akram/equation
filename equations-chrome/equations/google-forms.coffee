@@ -1,4 +1,4 @@
-imgURL = chrome.extension.getURL 'icon.png'
+imgURL = chrome.runtime.getURL 'icon.png'
 
 className = 'qe-input-box'
 
@@ -11,23 +11,23 @@ removeOldEquations = (equations) ->
     delete equations[equation] if now - equations[equation] > month
 
 rememberEquation = (equation) ->
-  chrome.storage.sync.get 'knownEquations', (items) ->
-    knownEquations = items.knownEquations ? {}
-    removeOldEquations knownEquations
-    knownEquations[equation] = Date.now()
-    chrome.storage.sync.set knownEquations: knownEquations
+  items = await chrome.storage.sync.get 'knownEquations'
+  knownEquations = items.knownEquations ? {}
+  removeOldEquations knownEquations
+  knownEquations[equation] = Date.now()
+  await chrome.storage.sync.set knownEquations: knownEquations
 
 forgetEquation = (equation) ->
-  chrome.storage.sync.get 'knownEquations', (items) ->
-    knownEquations = items.knownEquations ? {}
-    removeOldEquations knownEquations
-    delete knownEquations[equation]
-    chrome.storage.sync.set knownEquations: knownEquations
+  items = await chrome.storage.sync.get 'knownEquations'
+  knownEquations = items.knownEquations ? {}
+  removeOldEquations knownEquations
+  delete knownEquations[equation]
+  await chrome.storage.sync.set knownEquations: knownEquations
 
-knownEquation = (equation, callback) ->
-  chrome.storage.sync.get 'knownEquations', (items) ->
-    knownEquations = items.knownEquations ? {}
-    callback equation of knownEquations
+knownEquation = (equation) ->
+  items = await chrome.storage.sync.get 'knownEquations'
+  knownEquations = items.knownEquations ? {}
+  equation of knownEquations
 
 enableInputBox = (element) ->
   return if not element or element.classList.contains className
@@ -88,7 +88,8 @@ enableInputBox = (element) ->
     show()
     element.focus() if element.tagName in ['INPUT', 'TEXTAREA']
 
-  knownEquation elementValue(), (known) -> show() if known
+  known = await knownEquation elementValue()
+  show() if known
 
   if isInput
     element.parentNode.insertBefore button, element.nextSibling

@@ -2,21 +2,21 @@
 (function() {
   var handlePermissions;
 
-  handlePermissions = function(checkbox, permissions) {
-    chrome.permissions.contains(permissions, function(result) {
-      if (result) {
-        return checkbox.checked = true;
-      }
-    });
-    return checkbox.onclick = function() {
+  handlePermissions = async function(checkbox, permissions) {
+    var result;
+    result = (await chrome.permissions.contains(permissions));
+    if (result) {
+      checkbox.checked = true;
+    }
+    return checkbox.onclick = async function() {
+      var granted;
       if (checkbox.checked) {
-        return chrome.permissions.request(permissions, function(granted) {
-          if (!granted) {
-            return checkbox.checked = false;
-          }
-        });
+        granted = (await chrome.permissions.request(permissions));
+        if (!granted) {
+          return checkbox.checked = false;
+        }
       } else {
-        return chrome.permissions.remove(permissions);
+        return (await chrome.permissions.remove(permissions));
       }
     };
   };
@@ -25,13 +25,13 @@
     var enableGoogleForms, enableWebwork, permissions;
     enableWebwork = document.querySelector('#enableWebwork');
     permissions = {
-      permissions: ['tabs'],
+      permissions: ['scripting', 'tabs'],
       origins: ['http://*/*', 'https://*/*']
     };
     handlePermissions(enableWebwork, permissions);
     enableGoogleForms = document.querySelector('#enableGoogleForms');
     permissions = {
-      permissions: ['tabs', 'webNavigation'],
+      permissions: ['scripting', 'tabs', 'webNavigation'],
       origins: ['http://docs.google.com/*', 'https://docs.google.com/*']
     };
     return handlePermissions(enableGoogleForms, permissions);
