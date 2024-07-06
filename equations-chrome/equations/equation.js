@@ -356,10 +356,6 @@
           value = this.parseFunction(value, func);
         }
         value = this.parseOperator(value, 'lim');
-        // Preserve newlines
-        M.MathPlayer = false;
-        M.trustHtml = true;
-        value = value.replace(/\n/g, "\\html'<br>'");
         if (value) {
           ref1 = Equation.specialops;
           // Parse special operators
@@ -381,6 +377,8 @@
           }
           value = this.parseOverbars(value);
           value = this.parseMatrices(value);
+          // Preserve newlines
+          value = `\\table {${value.replace(/\n/g, "};{")}}`;
           if (this.resizeText) {
             // Resize to fit
             if (value.length > 160) {

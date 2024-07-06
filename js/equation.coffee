@@ -322,11 +322,6 @@ class Equation
 
     value = @parseOperator(value, 'lim')
 
-    # Preserve newlines
-    M.MathPlayer = false
-    M.trustHtml = true
-    value = value.replace /\n/g, "\\html'<br>'"
-
     if value
       # Parse special operators
       for op in Equation.specialops
@@ -343,6 +338,9 @@ class Equation
 
       value = @parseOverbars(value)
       value = @parseMatrices(value)
+
+      # Preserve newlines
+      value = "\\table {#{value.replace /\n/g, "};{"}}"
 
       if @resizeText
         # Resize to fit
