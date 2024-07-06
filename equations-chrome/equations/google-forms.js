@@ -57,7 +57,7 @@
     if (!element || element.classList.contains(className)) {
       return;
     }
-    wrapper = element.closest('.freebirdFormviewerComponentsQuestionTextRoot, .freebirdFormviewerViewItemsTextTextItemContainer');
+    wrapper = element.tagName === 'DIV' ? element : element.parentNode.closest('[jsname]');
     if (!wrapper) {
       return;
     }
@@ -88,6 +88,7 @@
       var inputBox;
       rememberEquation(elementValue());
       equationBox = document.createElement('div');
+      equationBox.classList.add(className);
       equationBox.style.marginTop = '5px';
       equationBox.style.fontSize = '1.5em';
       wrapper.parentNode.insertBefore(equationBox, wrapper);
@@ -133,22 +134,16 @@
     enableInputBox(inputBox);
   }
 
-  observer = new MutationObserver(function(mutations) {
-    var j, len1, mutation, results;
+  observer = new MutationObserver(function() {
+    var j, len1, results;
+    inputBoxes = document.querySelectorAll('[data-response] input[data-initial-value], [data-response] textarea[data-initial-value], div:has(+[data-noresponses]) > div > div');
     results = [];
-    for (j = 0, len1 = mutations.length; j < len1; j++) {
-      mutation = mutations[j];
-      inputBoxes = mutation.target.querySelectorAll('.quantumWizTextinputPaperinputInput, .quantumWizTextinputPapertextareaInput, .freebirdFormviewerViewItemsTextShortText, .freebirdFormviewerViewItemsTextLongText');
-      results.push((function() {
-        var k, len2, results1;
-        results1 = [];
-        for (k = 0, len2 = inputBoxes.length; k < len2; k++) {
-          inputBox = inputBoxes[k];
-          inputBox.style.display = 'inline-block';
-          results1.push(enableInputBox(inputBox));
-        }
-        return results1;
-      })());
+    for (j = 0, len1 = inputBoxes.length; j < len1; j++) {
+      inputBox = inputBoxes[j];
+      if (inputBox.tagName !== 'DIV') {
+        inputBox.style.display = 'inline-block';
+      }
+      results.push(enableInputBox(inputBox));
     }
     return results;
   });

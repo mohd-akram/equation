@@ -18,10 +18,9 @@ loadEquations = (tab) ->
 
   selector =
     if isGoogleForms tab.url then '
-      .quantumWizTextinputPaperinputInput,
-      .quantumWizTextinputPapertextareaInput,
-      .freebirdFormviewerViewItemsTextShortText,
-      .freebirdFormviewerViewItemsTextLongText
+      [data-response] input[data-initial-value],
+      [data-response] textarea[data-initial-value],
+      div:has(+[data-noresponses]) > div > div
     ' else 'input[id*=AnSwEr]'
 
   try

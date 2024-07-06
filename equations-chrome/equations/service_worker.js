@@ -32,7 +32,7 @@
     if (isGoogleForms(tab.url) && !chrome.webNavigation) {
       return;
     }
-    selector = isGoogleForms(tab.url) ? '.quantumWizTextinputPaperinputInput, .quantumWizTextinputPapertextareaInput, .freebirdFormviewerViewItemsTextShortText, .freebirdFormviewerViewItemsTextLongText' : 'input[id*=AnSwEr]';
+    selector = isGoogleForms(tab.url) ? '[data-response] input[data-initial-value], [data-response] textarea[data-initial-value], div:has(+[data-noresponses]) > div > div' : 'input[id*=AnSwEr]';
     try {
       try {
         results = (await chrome.scripting.executeScript({

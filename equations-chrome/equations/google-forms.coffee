@@ -31,10 +31,8 @@ knownEquation = (equation) ->
 
 enableInputBox = (element) ->
   return if not element or element.classList.contains className
-  wrapper = element.closest '
-    .freebirdFormviewerComponentsQuestionTextRoot,
-    .freebirdFormviewerViewItemsTextTextItemContainer
-  '
+  wrapper = if element.tagName is 'DIV' then element else
+    element.parentNode.closest '[jsname]'
   return unless wrapper
 
   element.classList.add className
@@ -66,6 +64,7 @@ enableInputBox = (element) ->
   show = ->
     rememberEquation elementValue()
     equationBox = document.createElement 'div'
+    equationBox.classList.add className
     equationBox.style.marginTop = '5px'
     equationBox.style.fontSize = '1.5em'
     wrapper.parentNode.insertBefore equationBox, wrapper
@@ -99,17 +98,15 @@ enableInputBox = (element) ->
 
 enableInputBox inputBox for inputBox in inputBoxes
 
-observer = new MutationObserver (mutations) ->
-  for mutation in mutations
-    inputBoxes = mutation.target.querySelectorAll '
-      .quantumWizTextinputPaperinputInput,
-      .quantumWizTextinputPapertextareaInput,
-      .freebirdFormviewerViewItemsTextShortText,
-      .freebirdFormviewerViewItemsTextLongText
-    '
-    for inputBox in inputBoxes
-      inputBox.style.display = 'inline-block'
-      enableInputBox inputBox
+observer = new MutationObserver () ->
+  inputBoxes = document.querySelectorAll '
+    [data-response] input[data-initial-value],
+    [data-response] textarea[data-initial-value],
+    div:has(+[data-noresponses]) > div > div
+  '
+  for inputBox in inputBoxes
+    inputBox.style.display = 'inline-block' unless inputBox.tagName is 'DIV'
+    enableInputBox inputBox
 
 observer.observe document.body, childList: true, subtree: true
 
