@@ -1,71 +1,81 @@
-isValidURL = (url) ->
-  try url = new URL url catch then return false
-  ['http:', 'https:'].includes(url.protocol) and
-  not url.href.startsWith 'https://chrome.google.com/webstore'
+allFeatures =
+  google:
+    scripts: [
+      id: 'google-forms-script'
+      js: ['google-forms.js']
+      matches: ['https://docs.google.com/forms/*']
+    ,
+      id: 'google-picker-script'
+      js: ['google-picker.js']
+      matches: ['https://docs.google.com/picker*']
+      allFrames: true
+    ]
+    permissions:
+      origins: ['https://docs.google.com/forms/*', 'https://docs.google.com/picker*']
+  webwork:
+    scripts: [
+      id: 'webwork-script'
+      js: ['webwork.js']
+      matches: ['*://*/*']
+    ]
+    permissions:
+      origins: ['*://*/*']
 
-isGoogleForms = (url) ->
-  return unless isValidURL url
-  url = new URL url
-  url.hostname is 'docs.google.com' and url.pathname.startsWith '/forms/'
+registerScripts = (name) ->
+  await chrome.scripting.registerContentScripts allFeatures[name].scripts
 
-getInputBoxes = (selector) ->
-  window.inputBoxes = document.querySelectorAll(selector);
-  window.inputBoxes.length
+unregisterScripts = (name) ->
+  await chrome.scripting.unregisterContentScripts
+    ids: allFeatures[name].scripts.map (s) -> s.id
 
-loadEquations = (tab) ->
-  return unless isValidURL tab.url
-  return if isGoogleForms(tab.url) and not chrome.webNavigation
+requestPermissions = (name) ->
+  await chrome.permissions.request allFeatures[name].permissions
 
-  selector =
-    if isGoogleForms tab.url then '
-      [data-response] input[data-initial-value],
-      [data-response] textarea[data-initial-value],
-      div:has(+[data-noresponses]) > div > div
-    ' else 'input[id*=AnSwEr]'
+removePermissions = (name) ->
+  await chrome.permissions.remove allFeatures[name].permissions
 
-  try
-    try results = await chrome.scripting.executeScript
-      func: getInputBoxes
-      args: [selector]
-      target:
-        tabId: tab.id
-    catch then return
+getFeatures = ->
+  (await chrome.storage.sync.get 'features').features ? {}
 
-    if results[0].result > 0
-      await chrome.scripting.insertCSS
-        files: ['vendor/jqmath-0.4.3.css']
-        target:
-          tabId: tab.id
+getFeature = (name) ->
+  (await getFeatures())[name] ? {}
 
-      await chrome.scripting.insertCSS
-        css: 'fmath.ma-block { text-align: left }'
-        target:
-          tabId: tab.id
+saveFeature = (name, feature) ->
+  features = await getFeatures()
+  features[name] = feature
+  await chrome.storage.sync.set { features }
 
-      await chrome.scripting.executeScript
-        files: [
-          'vendor/jquery-3.6.0.min.js'
-          'vendor/jqmath-etc-0.4.6.min.js'
-          'equation.js'
-          if isGoogleForms tab.url then 'google-forms.js' else 'webwork.js'
-        ]
-        target:
-          tabId: tab.id
+enableFeature = (name) ->
+  feature = await getFeature name
+  return if feature.enabled
+  feature.enabled = true
+  await registerScripts name
+  await saveFeature name, feature
 
-chrome.tabs.onUpdated.addListener (tabId, changeInfo, tab) ->
-  return unless changeInfo.status is 'complete' and isValidURL tab.url
-  permitted = await chrome.permissions.contains
-    permissions: ['scripting', 'tabs']
-    origins: [tab.url]
-  loadEquations tab if permitted
+disableFeature = (name) ->
+  feature = await getFeature name
+  return unless feature.enabled
+  feature.enabled = false
+  await unregisterScripts name
+  await saveFeature name, feature
 
-if chrome.webNavigation
-  chrome.webNavigation.onCompleted.addListener (e) ->
-    return unless isValidURL e.url
-    url = new URL e.url
-    if url.hostname is 'docs.google.com' and url.pathname is '/picker'
-      await chrome.scripting.executeScript
-        files: ['google-forms.js']
-        target:
-          tabId: e.tabId
-          frameIds: [e.frameId]
+handleMessage = (request) ->
+  if request.getFeature
+    await getFeature request.getFeature
+  else if request.enableFeature
+    await enableFeature request.enableFeature
+  else if request.disableFeature
+    await disableFeature request.disableFeature
+  else if request.requestPermissions
+    await requestPermissions request.requestPermissions
+  else if request.removePermissions
+    await removePermissions request.removePermissions
+
+chrome.runtime.onMessage.addListener (request, sender, sendResponse) ->
+  handleMessage(request).then(sendResponse)
+  return true
+
+chrome.runtime.onInstalled.addListener ->
+  for name of allFeatures
+    if (await getFeature name).enabled
+      await registerScripts name

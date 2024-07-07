@@ -1,24 +1,37 @@
-handlePermissions = (checkbox, permissions) ->
-  result = await chrome.permissions.contains permissions
-  if result
+checkboxes =
+  google: '#enableGoogleForms'
+  webwork: '#enableWebwork'
+
+updatePermissions = ->
+  for name, checkbox of checkboxes
+    unless document.querySelector(checkbox).checked
+      await chrome.runtime.sendMessage removePermissions: name
+
+  # We need to do this because if a wildcard permission is removed, all
+  # permissions are removed
+  for name, checkbox of checkboxes
+    if document.querySelector(checkbox).checked
+      await chrome.runtime.sendMessage requestPermissions: name
+
+handleCheckbox = (name) ->
+  checkbox = document.querySelector checkboxes[name]
+
+  feature = await chrome.runtime.sendMessage getFeature: name
+  if feature.enabled
     checkbox.checked = true
 
   checkbox.onclick = ->
     if checkbox.checked
-      granted = await chrome.permissions.request permissions
-      if not granted
+      granted = await chrome.runtime.sendMessage requestPermissions: name
+      if granted
+        await chrome.runtime.sendMessage enableFeature: name
+      else
         checkbox.checked = false
-    else await chrome.permissions.remove permissions
+    else
+      await chrome.runtime.sendMessage disableFeature: name
+
+    updatePermissions()
 
 window.onload = ->
-  enableWebwork = document.querySelector '#enableWebwork'
-  permissions =
-    permissions: ['scripting', 'tabs']
-    origins: ['http://*/*', 'https://*/*']
-  handlePermissions enableWebwork, permissions
-
-  enableGoogleForms = document.querySelector '#enableGoogleForms'
-  permissions =
-    permissions: ['scripting', 'tabs', 'webNavigation']
-    origins: ['http://docs.google.com/*', 'https://docs.google.com/*']
-  handlePermissions enableGoogleForms, permissions
+  for name of checkboxes
+    handleCheckbox name

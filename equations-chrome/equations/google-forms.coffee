@@ -2,8 +2,6 @@ imgURL = chrome.runtime.getURL 'icon.png'
 
 className = 'qe-input-box'
 
-inputBoxes = window.inputBoxes ? []
-
 removeOldEquations = (equations) ->
   month = 30 * 24 * 60 * 60 * 1000
   now = Date.now()
@@ -87,61 +85,32 @@ enableInputBox = (element) ->
     show()
     element.focus() if element.tagName in ['INPUT', 'TEXTAREA']
 
-  known = await knownEquation elementValue()
-  show() if known
-
   if isInput
     element.parentNode.insertBefore button, element.nextSibling
   else
     button.style.float = 'right'
     element.appendChild button
 
-enableInputBox inputBox for inputBox in inputBoxes
+  known = await knownEquation elementValue()
+  show() if known
 
-observer = new MutationObserver () ->
-  inputBoxes = document.querySelectorAll '
+getInputBoxes = ->
+  document.querySelectorAll '
     [data-response] input[data-initial-value],
     [data-response] textarea[data-initial-value],
     div:has(+[data-noresponses]) > div > div
   '
-  for inputBox in inputBoxes
-    inputBox.style.display = 'inline-block' unless inputBox.tagName is 'DIV'
-    enableInputBox inputBox
 
-observer.observe document.body, childList: true, subtree: true
+inputBoxes = getInputBoxes()
+if inputBoxes
+  await import(chrome.runtime.getURL 'load-math.js')
 
-createDataTransfer = (url, name) ->
-  parts = url.split ','
-  type = parts[0].split(':')[1].split(';')[0]
-  data = Uint8Array.from atob(parts[1]), (c) -> c.charCodeAt 0
-  file = new File [data], name, type: type
-  dt = new DataTransfer
-  dt.items.add file
-  dt
+  enableInputBox inputBox for inputBox in inputBoxes
 
-imageToDataURL = (img, width, height) ->
-  canvas = document.createElement 'canvas'
-  ctx = canvas.getContext '2d'
+  observer = new MutationObserver () ->
+    inputBoxes = getInputBoxes()
+    for inputBox in inputBoxes
+      inputBox.style.display = 'inline-block' unless inputBox.tagName is 'DIV'
+      enableInputBox inputBox
 
-  canvas.width = width
-  canvas.height = height
-
-  ctx.drawImage img, 0, 0, width, height
-
-  canvas.toDataURL()
-
-picker = Array.from(document.querySelectorAll('[jsaction*=drop]')).pop()
-
-if picker
-  picker.addEventListener 'drop', (e) ->
-    e.preventDefault()
-    url = e.dataTransfer.getData 'text/uri-list'
-    return unless url.startsWith 'data:image/png;base64,'
-    img = document.createElement 'img'
-    img.onload = ->
-      url = imageToDataURL img, img.width / 2, img.height / 2
-      dt = createDataTransfer url, 'equation.png'
-      input = picker.querySelector 'input[type=file]'
-      input.files = dt.files
-      input.dispatchEvent new Event 'change', bubbles: true
-    img.src = url
+  observer.observe document.body, childList: true, subtree: true

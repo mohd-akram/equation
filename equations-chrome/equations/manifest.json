@@ -25,12 +25,11 @@
       "matches": ["https://www.wolframalpha.com/input*"]
     }
   ],
-  "permissions": ["storage"],
-  "optional_permissions": ["scripting", "tabs", "webNavigation"],
+  "permissions": ["storage", "scripting"],
   "optional_host_permissions": [
-    "https://docs.google.com/*",
-    "http://*/*",
-    "https://*/*"
+    "https://docs.google.com/picker*",
+    "https://docs.google.com/forms/*",
+    "*://*/*"
   ],
   "icons": {
     "48": "icon48.png",
@@ -38,8 +37,15 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["icon.png"],
-      "matches": ["https://www.wolframalpha.com/*", "https://docs.google.com/*"]
+      "resources": [
+        "icon.png",
+        "equation.js",
+        "load-math.js",
+        "vendor/jquery-3.6.0.min.js",
+        "vendor/jqmath-etc-0.4.6.min.js",
+        "vendor/jqmath-0.4.3.css"
+      ],
+      "matches": ["*://*/*"]
     }
   ]
 }
