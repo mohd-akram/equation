@@ -55,8 +55,8 @@
       equationBox = document.createElement('div');
       equationBox.id = 'equationBox';
       equationBox.innerHTML = 'Type an equation above';
-      view.insertBefore(equationBox, menu);
-      query = view.querySelector('input');
+      view.insertBefore(equationBox, menu.previousElementSibling);
+      query = view.querySelector('textarea');
       equation = new Equation(query, equationBox);
     } else {
       equation.disable();

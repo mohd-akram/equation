@@ -1,8 +1,14 @@
 #equationBox {
   text-align: center;
   overflow: auto;
-  color: #FE6518;
+  color: black;
   font-size: 1.5em;
-  margin-top: 15px;
+  margin-bottom: 15px;
   padding-bottom: 9px;
+}
+
+@media (prefers-color-scheme: dark) {
+  #equationBox {
+    color: white;
+  }
 }
