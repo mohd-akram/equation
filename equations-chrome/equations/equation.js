@@ -44,7 +44,7 @@
       return this.timeout = setTimeout(() => {
         this.timeout = null;
         this.hide();
-        return domtoimage.toPng(this.element).then((url) => {
+        return modernScreenshot.domToPng(this.element).then((url) => {
           this.image.width = this.element.clientWidth;
           this.image.height = this.element.clientHeight;
           this.image.style.objectFit = 'cover';
@@ -480,7 +480,7 @@
       }
 
       enable() {
-        if (window.domtoimage) {
+        if (window.modernScreenshot) {
           this.equationImage = new ElementImage(this.equationBox);
         }
         this.enableShortcuts();

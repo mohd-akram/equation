@@ -3,7 +3,7 @@ var css, file, i, j, js, len, len1, link, style;
 
 css = ['vendor/jqmath-0.4.3.css'];
 
-js = ['vendor/jquery-3.6.0.min.js', 'vendor/jqmath-etc-0.4.6.min.js', 'equation.js'];
+js = ['vendor/jquery-4.0.0.slim.min.js', 'vendor/jqmath-etc-0.4.6.min.js', 'equation.js'];
 
 for (i = 0, len = css.length; i < len; i++) {
   file = css[i];

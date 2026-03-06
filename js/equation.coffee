@@ -23,7 +23,7 @@ class ElementImage
     @timeout = setTimeout =>
       @timeout = null
       @hide()
-      domtoimage.toPng(@element)
+      modernScreenshot.domToPng(@element)
         .then (url) =>
           @image.width = @element.clientWidth
           @image.height = @element.clientHeight
@@ -425,7 +425,7 @@ class Equation
     @inputBox.removeEventListener('keyup', @keyUpHandler, false)
 
   enable: ->
-    @equationImage = new ElementImage @equationBox if window.domtoimage
+    @equationImage = new ElementImage @equationBox if window.modernScreenshot
     @enableShortcuts()
     @inputBox.addEventListener('input', @updateMath, false)
     @inputBox.addEventListener('search', @searchHandler, false)

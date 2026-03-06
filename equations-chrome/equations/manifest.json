@@ -16,7 +16,7 @@
   "content_scripts": [
     {
       "js": [
-        "vendor/jquery-3.6.0.min.js",
+        "vendor/jquery-4.0.0.slim.min.js",
         "vendor/jqmath-etc-0.4.6.min.js",
         "equation.js",
         "wolfram.js"
@@ -41,7 +41,7 @@
         "icon.png",
         "equation.js",
         "load-math.js",
-        "vendor/jquery-3.6.0.min.js",
+        "vendor/jquery-4.0.0.slim.min.js",
         "vendor/jqmath-etc-0.4.6.min.js",
         "vendor/jqmath-0.4.3.css"
       ],
