@@ -17,6 +17,7 @@ body {
   margin-bottom: 10px;
   border-style: solid;
   border-radius: 2px;
+  max-width: calc(100% - 6rem);
 }
 
 #button {
